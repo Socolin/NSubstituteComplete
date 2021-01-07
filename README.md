@@ -8,11 +8,10 @@ A Rider / Resharper Plugin that provide quick fixes and smart autocomplete when 
 
 ## Build plugin
 
-###  Rider
 ```shell
 ./gradlew :buildPlugin
 ```
 
-### Resharper
-- TODO (I'm looking for someone using resharper to document this)
+## Notes
 
+This plugin was inspired by [MoqComplete](https://github.com/Abc-Arbitrage/Abc.MoqComplete). And I look into its code to find some un-documented part of Rider API when I don't find how to do some stuff. 
