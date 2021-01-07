@@ -10,6 +10,7 @@ using JetBrains.ReSharper.Psi.CSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.CSharp.Parsing;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.Impl.Types;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
 {
@@ -30,22 +31,33 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             if (cSharpGenericToken.GetContainingTypeDeclaration()?.NameIdentifier.Name.ToLowerInvariant().Contains("tests") != true)
                 return false;
 
-            if (cSharpGenericToken.Parent?.Parent?.Parent is ILocalVariableDeclaration localVariableDeclaration)
-                return AutoCompleteLocalVariable(context, collector, localVariableDeclaration);
+            if (cSharpGenericToken.Parent?.Parent is INamedMemberInitializer namedMemberInitializer)
+                return AutoCompleteNamedMember(context, collector, namedMemberInitializer);
 
-            if (cSharpGenericToken.Parent?.Parent is IPropertyInitializer propertyInitializer)
-                return AutoCompletePropertyInitializer(context, collector, propertyInitializer);
+            if (cSharpGenericToken.Parent?.Parent is IDeclaration declaration)
+                return AutoCompleteDeclaration(context, collector, declaration);
+
+            if (cSharpGenericToken.Parent?.Parent is IExpressionInitializer expressionInitializer)
+                return AutoCompleteExpressionInitializer(context, collector, expressionInitializer);
 
             return false;
         }
 
-        private static bool AutoCompleteLocalVariable(CSharpCodeCompletionContext context, IItemsCollector collector, ILocalVariableDeclaration localVariableDeclaration)
+        private bool AutoCompleteDeclaration(CSharpCodeCompletionContext context, IItemsCollector collector, IDeclaration declaration)
         {
-            AddLookupItem(context, collector, localVariableDeclaration.DeclaredName);
+            AddLookupItem(context, collector, declaration.DeclaredName);
             return true;
         }
 
-        private bool AutoCompletePropertyInitializer(CSharpCodeCompletionContext context, IItemsCollector collector, IPropertyInitializer propertyInitializer)
+        private bool AutoCompleteExpressionInitializer(CSharpCodeCompletionContext context, IItemsCollector collector, IExpressionInitializer expressionInitializer)
+        {
+            if (!(expressionInitializer.Parent is IDeclaration declaration))
+                return false;
+            AddLookupItem(context, collector, declaration.DeclaredName);
+            return true;
+        }
+
+        private bool AutoCompleteNamedMember(CSharpCodeCompletionContext context, IItemsCollector collector, INamedMemberInitializer propertyInitializer)
         {
             var typeName = (propertyInitializer.GetConstructedType() as DeclaredTypeBase)?.GetClrName().ShortName;
 
