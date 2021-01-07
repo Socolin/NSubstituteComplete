@@ -15,7 +15,7 @@ using JetBrains.ReSharper.Psi.Tree;
 namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
 {
     [Language(typeof(CSharpLanguage))]
-    public class TestProvider : ItemsProviderOfSpecificContext<CSharpCodeCompletionContext>
+    public class TestStringsCompletionProvider : ItemsProviderOfSpecificContext<CSharpCodeCompletionContext>
     {
         protected override bool IsAvailable(CSharpCodeCompletionContext context)
         {
