@@ -12,6 +12,12 @@ A Rider / Resharper Plugin that provide quick fixes and smart autocomplete when 
 ./gradlew :buildPlugin
 ```
 
+## Functionality
+
+### QuickFix: Fill with mocks
+
+![Fill with mocks example](doc/images/QuickFix-FillWithMocks.gif)
+
 ## Notes
 
 This plugin was inspired by [MoqComplete](https://github.com/Abc-Arbitrage/Abc.MoqComplete). And I look into its code to find some un-documented part of Rider API when I don't find how to do some stuff. 
