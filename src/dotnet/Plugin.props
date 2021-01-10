@@ -3,9 +3,9 @@
     <SdkVersion>2020.3.2</SdkVersion>
 
     <Title>NSubstituteComplete</Title>
-    <Description>Description</Description>
+    <Description>Provide quick fixes and smart autocomplete when using NSubstitute</Description>
 
-    <Authors>Author</Authors>
+    <Authors>Bertrand Provost</Authors>
     <Copyright>Copyright $([System.DateTime]::Now.Year) Maintainers of NSubstituteComplete</Copyright>
     <PackageTags>resharper plugin</PackageTags>
 

@@ -11,5 +11,10 @@
 <p>Provide quick fixes and smart autocomplete when using NSubstitute</p>
 ]]>
   </description>
+  <change-notes>
+    <![CDATA[
+<p>Initial version</p>
+]]>
+  </change-notes>
 
 </idea-plugin>
