@@ -2,7 +2,9 @@ using System.Linq;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure;
+using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info;
+using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Matchers;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
 using JetBrains.ReSharper.Feature.Services.CSharp.CodeCompletion.Infrastructure;
@@ -46,9 +48,8 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
 
             foreach (var expectedType in context.ExpectedTypesContext.ExpectedITypes)
             {
-                var typeName = expectedType.Type.GetPresentableName(CSharpLanguage.Instance);
-                AddArgLookupItem(context, collector, typeName);
-                AddIsLookupItem(context, collector, typeName);
+                AddArgLookupItem(context, collector, expectedType.Type);
+                AddIsLookupItem(context, collector, expectedType.Type);
             }
 
             var argumentIndex = mockedMethodArgument.IndexOf();
@@ -68,30 +69,58 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
 
                 var parameter = method.Parameters.Select(x => $"Arg.Any<{x.Type.GetPresentableName(CSharpLanguage.Instance)}>()");
                 var completionText = string.Join(", ", parameter);
-                collector.Add(CreateLookupItem(context.CompletionRanges, completionText, null));
+                collector.Add(CreateTextLookupItem(context.CompletionRanges, completionText, null));
             }
 
             return true;
         }
 
-        private static void AddArgLookupItem(CSharpCodeCompletionContext context, IItemsCollector collector, string typeName)
+        private static void AddArgLookupItem(CSharpCodeCompletionContext context, IItemsCollector collector, IType type)
         {
+            if (context.IsQualified && LeftPartIsArg(context))
+                return;
+            var typeName = type.GetPresentableName(CSharpLanguage.Instance);
             var text = context.IsQualified ? $"Any<{typeName}>()" : $"Arg.Any<{typeName}>()";
-            collector.Add(CreateLookupItem(context.CompletionRanges, text, typeName));
+            collector.Add(CreateLookupItem(context, text, typeName, type));
         }
 
-        private static void AddIsLookupItem(CSharpCodeCompletionContext context, IItemsCollector collector, string typeName)
+        private static void AddIsLookupItem(CSharpCodeCompletionContext context, IItemsCollector collector, IType type)
         {
+            if (context.IsQualified && LeftPartIsArg(context))
+                return;
+
+            var typeName = type.GetPresentableName(CSharpLanguage.Instance);
             var firstLetter = typeName.First().ToLowerFast();
             var text = context.IsQualified ? $"Is<{typeName}>({firstLetter} => )" : $"Arg.Is<{typeName}>({firstLetter} => )";
 
-
-            var lookupItem = CreateLookupItem(context.CompletionRanges, text, typeName);
+            var lookupItem = CreateLookupItem(context, text, typeName, type);
             lookupItem.SetInsertCaretOffset(-1);
             collector.Add(lookupItem);
         }
 
-        private static LookupItem<TextualInfo> CreateLookupItem(TextLookupRanges completionRanges, string text, string type)
+        private static bool LeftPartIsArg(CSharpCodeCompletionContext context)
+        {
+            var leftPartType = (context.NodeInFile.PrevSibling as IReferenceExpression)?.Reference.Resolve().DeclaredElement?.ShortName;
+            if (leftPartType != "Arg")
+                return true;
+            return false;
+        }
+
+        private static LookupItem<TypeInfo> CreateLookupItem(CSharpCodeCompletionContext context, string text, string typename, IType type)
+        {
+            var lookupItem = LookupItemFactory.CreateLookupItem(new TypeInfo(text, type, CSharpLanguage.Instance, context.BasicContext.LookupItemsOwner))
+                .WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<TypeInfo>(_.Info, typename, true))
+                .WithBehavior(_ => (ILookupItemBehavior) new TextualBehavior<TypeInfo>(_.Info))
+                .WithMatcher(_ => (ILookupItemMatcher) new TextualMatcher<TextualInfo>(_.Info));
+            lookupItem.WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<TypeInfo>(_.Info, typename, true, PsiSymbolsThemedIcons.Method.Id));
+            lookupItem.WithHighSelectionPriority();
+            lookupItem.SetBind(true);
+            lookupItem.SetRanges(context.CompletionRanges);
+
+            return lookupItem;
+        }
+
+        private static LookupItem<TextualInfo> CreateTextLookupItem(TextLookupRanges completionRanges, string text, string type)
         {
             var lookupItem = CSharpLookupItemFactory.Instance.CreateTextLookupItem(completionRanges, text, type, false, false);
             lookupItem.WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<TextualInfo>(_.Info, type, true, PsiSymbolsThemedIcons.Method.Id));
