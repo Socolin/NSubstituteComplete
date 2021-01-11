@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
@@ -77,7 +78,7 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
 
         private static void AddArgLookupItem(CSharpCodeCompletionContext context, IItemsCollector collector, IType type)
         {
-            if (context.IsQualified && LeftPartIsArg(context))
+            if (context.IsQualified && !LeftPartStartsWith(context, "Arg.", "Any"))
                 return;
             var typeName = type.GetPresentableName(CSharpLanguage.Instance);
             var text = context.IsQualified ? $"Any<{typeName}>()" : $"Arg.Any<{typeName}>()";
@@ -86,7 +87,7 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
 
         private static void AddIsLookupItem(CSharpCodeCompletionContext context, IItemsCollector collector, IType type)
         {
-            if (context.IsQualified && LeftPartIsArg(context))
+            if (context.IsQualified && !LeftPartStartsWith(context, "Arg.", "Is"))
                 return;
 
             var typeName = type.GetPresentableName(CSharpLanguage.Instance);
@@ -98,10 +99,17 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             collector.Add(lookupItem);
         }
 
-        private static bool LeftPartIsArg(CSharpCodeCompletionContext context)
+        private static bool LeftPartStartsWith(CSharpCodeCompletionContext context, string expectedStats, string expectedOptionalPart)
         {
-            var leftPartType = (context.NodeInFile.PrevSibling as IReferenceExpression)?.Reference.Resolve().DeclaredElement?.ShortName;
-            if (leftPartType != "Arg")
+            var leftPart = (context.NodeInFile.Parent as IReferenceExpression)?.GetText();
+            if (leftPart?.StartsWith(expectedStats, StringComparison.InvariantCultureIgnoreCase) != true)
+                return false;
+
+            var optionalPart = leftPart.Substring(expectedStats.Length);
+            if (string.IsNullOrEmpty(optionalPart))
+                return true;
+
+            if (expectedOptionalPart.StartsWith(optionalPart, StringComparison.InvariantCultureIgnoreCase))
                 return true;
             return false;
         }
