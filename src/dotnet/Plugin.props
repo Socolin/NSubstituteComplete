@@ -9,8 +9,8 @@
     <Copyright>Copyright $([System.DateTime]::Now.Year) Maintainers of NSubstituteComplete</Copyright>
     <PackageTags>resharper plugin</PackageTags>
 
-    <PackageProjectUrl></PackageProjectUrl>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Socolin/NSubstituteComplete</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/Socolin/NSubstituteComplete/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl></PackageIconUrl>
   </PropertyGroup>
 </Project>
