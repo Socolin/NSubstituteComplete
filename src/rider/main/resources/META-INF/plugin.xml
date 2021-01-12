@@ -13,7 +13,7 @@
   </description>
   <change-notes>
     <![CDATA[
-<p>Initial version</p>
+<p>Improve where "Fill missing arguments with NSubstitute mocks" add new mock init</p>
 ]]>
   </change-notes>
 
