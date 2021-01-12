@@ -101,6 +101,13 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
             var psiServices = treeNode.GetPsiServices();
             var psiSourceFile = treeNode.GetSourceFile();
 
+            var lastInitializedSubstitute = block
+                .Children()
+                .OfType<IExpressionStatement>()
+                .Where(statement => statement.GetTreeStartOffset().Offset < _objectCreationExpression.GetContainingStatement().GetTreeStartOffset().Offset)
+                .Where(statement => statement.Expression.Children().OfType<IInvocationExpression>().FirstOrDefault()?.GetText()?.StartsWith("Substitute.For") == true)
+                .LastOrDefault();
+
             var arguments = new LocalList<ICSharpArgument>();
             foreach (var parameter in targetConstructor.Parameters)
             {
@@ -130,7 +137,10 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
                     _classDeclaration.AddClassMemberDeclaration((IClassMemberDeclaration) fieldDeclaration);
 
                     var initializeMockStatement = elementFactory.CreateStatement("$0 = $1.For<$2>();", fieldName, substituteClass, parameter.Type);
-                    block.AddStatementBefore(initializeMockStatement, _objectCreationExpression.GetContainingStatement());
+                    if (lastInitializedSubstitute == null)
+                        block.AddStatementBefore(initializeMockStatement, _objectCreationExpression.GetContainingStatement());
+                    else
+                        block.AddStatementAfter(initializeMockStatement, lastInitializedSubstitute);
 
                     var argument = elementFactory.CreateArgument(ParameterKind.VALUE, elementFactory.CreateExpression("$0", fieldName));
                     arguments.Add(argument);
