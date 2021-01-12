@@ -84,7 +84,7 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
                 return;
             var typeName = expectedType.Type.GetPresentableName(context.Language);
             var text = context.IsQualified ? $"Any<{typeName}>()" : $"Arg.Any<{typeName}>()";
-            var lookupItem = CreateArgumentLookupItem(context, "Any", text, typeName, expectedType.DeclaredType);
+            var lookupItem = CreateArgumentLookupItem(context, "Any", '\0', text, typeName, expectedType.DeclaredType);
             if (lookupItem != null)
                 collector.Add(lookupItem);
         }
@@ -98,7 +98,7 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             var firstLetter = typeName.First().ToLowerFast();
             var text = context.IsQualified ? $"Is<{typeName}>({firstLetter} => )" : $"Arg.Is<{typeName}>({firstLetter} => )";
 
-            var lookupItem = CreateArgumentLookupItem(context, "Is", text, typeName, expectedType.DeclaredType);
+            var lookupItem = CreateArgumentLookupItem(context, "Is", firstLetter, text, typeName, expectedType.DeclaredType);
             lookupItem.SetInsertCaretOffset(-1);
             collector.Add(lookupItem);
         }
@@ -118,9 +118,9 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             return false;
         }
 
-        private static LookupItem<NSubstituteArgumentInformation> CreateArgumentLookupItem(CSharpCodeCompletionContext context, string argSuffix, string text, string typename, IType type)
+        private static LookupItem<NSubstituteArgumentInformation> CreateArgumentLookupItem(CSharpCodeCompletionContext context, string argSuffix, char typeFirstLetter, string text, string typename, IType type)
         {
-            var info = new NSubstituteArgumentInformation(text, text, type, argSuffix)
+            var info = new NSubstituteArgumentInformation(text, text, type, argSuffix, typeFirstLetter)
             {
                 Ranges = context.CompletionRanges,
                 IsDynamic = false
@@ -133,6 +133,11 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
 
             lookupItem.WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<NSubstituteArgumentInformation>(_.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
             lookupItem.WithHighSelectionPriority();
+            if (argSuffix == "Is")
+            {
+                lookupItem.SetInsertCaretOffset(-1);
+                lookupItem.SetReplaceCaretOffset(-1);
+            }
 
             return lookupItem;
         }

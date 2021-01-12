@@ -7,6 +7,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.Transactions;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
@@ -30,12 +31,20 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider.Behaviors
         {
             var psiServices = solution.GetPsiServices();
             var argumentExpression = TextControlToPsi.GetElement<ICSharpArgument>(solution, textControl);
+            ICSharpArgument addedArgument;
             using (new PsiTransactionCookie(psiServices, DefaultAction.Commit, "Insert arguments"))
             {
                 var factory = CSharpElementFactory.GetInstance(argumentExpression);
-                var newArgument = factory.CreateArgument(ParameterKind.VALUE, factory.CreateExpression($"Arg.{Info.ArgSuffix}<$0>()", Info.Type));
-                argumentExpression.ReplaceBy(newArgument);
+
+                ICSharpArgument newArgument;
+                if (Info.ArgSuffix == "Is")
+                    newArgument = factory.CreateArgument(ParameterKind.VALUE, factory.CreateExpression($"Arg.{Info.ArgSuffix}<$0>({Info.TypeFirstLetter} => )", Info.Type));
+                else
+                    newArgument = factory.CreateArgument(ParameterKind.VALUE, factory.CreateExpression($"Arg.{Info.ArgSuffix}<$0>()", Info.Type));
+
+                addedArgument = argumentExpression.ReplaceBy(newArgument);
             }
+            textControl.Caret.MoveTo(addedArgument.GetDocumentEndOffset().Shift(Info.InsertCaretOffset), CaretVisualPlacement.Generic);
         }
     }
 }
