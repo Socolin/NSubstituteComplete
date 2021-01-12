@@ -105,7 +105,7 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
                 .Children()
                 .OfType<IExpressionStatement>()
                 .Where(statement => statement.GetTreeStartOffset().Offset < _objectCreationExpression.GetContainingStatement().GetTreeStartOffset().Offset)
-                .Where(statement => statement.Expression.Children().OfType<IInvocationExpression>().FirstOrDefault()?.GetText()?.StartsWith("Substitute.For") == true)
+                .Where(statement => statement.Expression.Children().OfType<IInvocationExpression>().FirstOrDefault()?.GetText().StartsWith("Substitute.For") == true)
                 .LastOrDefault();
 
             var arguments = new LocalList<ICSharpArgument>();
