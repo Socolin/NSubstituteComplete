@@ -13,7 +13,10 @@
   </description>
   <change-notes>
     <![CDATA[
-<p>Improve where "Fill missing arguments with NSubstitute mocks" add new mock init</p>
+<ul>
+<li>Improve "QuickFix: Generate missing arguments as mock" now it add mock initializer with the others.</li>
+<li>Improve "Completion: Auto fill argument with `Arg.Any` `Arg.Is`". Automatically add missing `using` when referencing a type. Also improved when it's proposed</li>
+</ul>
 ]]>
   </change-notes>
 
