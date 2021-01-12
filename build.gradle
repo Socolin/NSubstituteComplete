@@ -15,7 +15,7 @@ buildscript {
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.3.61'
-    id 'org.jetbrains.intellij' version '0.4.19' // https://github.com/JetBrains/gradle-intellij-plugin/releases
+    id 'org.jetbrains.intellij' version '0.4.22' // https://github.com/JetBrains/gradle-intellij-plugin/releases
 }
 
 ext {
@@ -158,5 +158,20 @@ prepareSandbox {
             def file = file(f)
             if (!file.exists()) throw new RuntimeException("File ${file} does not exist")
         })
+    }
+}
+
+publishPlugin {
+    dependsOn buildPlugin
+
+    token intellijPublishToken
+    channels(!version.contains("-") ? 'Stable' : 'EAP')
+
+    doLast {
+        exec {
+            executable "dotnet"
+            args "nuget","push","output/${DotnetPluginId}.${version}.nupkg","--api-key",token,"--source","https://plugins.jetbrains.com"
+            workingDir rootDir
+        }
     }
 }
