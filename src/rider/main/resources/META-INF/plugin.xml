@@ -14,8 +14,8 @@
   <change-notes>
     <![CDATA[
 <ul>
-<li>Improve "QuickFix: Generate missing arguments as mock" now it add mock initializer with the others.</li>
-<li>Improve "Completion: Auto fill argument with `Arg.Any` `Arg.Is`". Automatically add missing `using` when referencing a type. Also improved when it's proposed</li>
+<li>Improve when QuickFix and Completions are shown.</li>
+<li>Add new Completion: Suggest <span style="font-family: monospace">Substitute.For&lt;T&gt;</span></li>
 </ul>
 ]]>
   </change-notes>
