@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure;
@@ -15,6 +16,7 @@ using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.Resources;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using ReSharperPlugin.NSubstituteComplete.CompletionProvider.Behaviors;
 
@@ -130,7 +132,15 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
 
             var lookupItem = LookupItemFactory.CreateLookupItem(info)
                 .WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<NSubstituteArgumentInformation>(_.Info, typename, true))
-                .WithBehavior(_ => (ILookupItemBehavior) new InsertNSubstituteArgumentBehavior(_.Info))
+                .WithBehavior(_ => (ILookupItemBehavior) new InsertNSubstituteArgumentBehavior(_.Info,
+                    (information, factory) =>
+                    {
+                        var argClass = TypeFactory.CreateTypeByCLRName("NSubstitute.Arg", information.Type.Module);
+
+                        if (information.ArgSuffix == "Is")
+                            return factory.CreateArgument(ParameterKind.VALUE, factory.CreateExpression($"$0.{information.ArgSuffix}<$1>({information.TypeFirstLetter} => )", argClass, information.Type));
+                        return factory.CreateArgument(ParameterKind.VALUE, factory.CreateExpression($"$0.{information.ArgSuffix}<$1>()", argClass, information.Type));
+                    }))
                 .WithMatcher(_ => (ILookupItemMatcher) new TextualMatcher<TextualInfo>(_.Info));
 
             lookupItem.WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<NSubstituteArgumentInformation>(_.Info, null, true, PsiSymbolsThemedIcons.Method.Id));

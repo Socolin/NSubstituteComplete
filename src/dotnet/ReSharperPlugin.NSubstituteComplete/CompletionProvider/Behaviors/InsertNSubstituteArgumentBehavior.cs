@@ -1,3 +1,4 @@
+using System;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors;
@@ -15,9 +16,12 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider.Behaviors
 {
     public class InsertNSubstituteArgumentBehavior : TextualBehavior<NSubstituteArgumentInformation>
     {
-        public InsertNSubstituteArgumentBehavior(NSubstituteArgumentInformation info)
+        private readonly Func<NSubstituteArgumentInformation, CSharpElementFactory, ICSharpArgument> _createArgumentFn;
+
+        public InsertNSubstituteArgumentBehavior(NSubstituteArgumentInformation info, Func<NSubstituteArgumentInformation, CSharpElementFactory, ICSharpArgument> createArgumentFn)
             : base(info)
         {
+            _createArgumentFn = createArgumentFn;
         }
 
         public override void Accept(
@@ -35,13 +39,7 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider.Behaviors
             using (new PsiTransactionCookie(psiServices, DefaultAction.Commit, "Insert arguments"))
             {
                 var factory = CSharpElementFactory.GetInstance(argumentExpression);
-
-                ICSharpArgument newArgument;
-                if (Info.ArgSuffix == "Is")
-                    newArgument = factory.CreateArgument(ParameterKind.VALUE, factory.CreateExpression($"Arg.{Info.ArgSuffix}<$0>({Info.TypeFirstLetter} => )", Info.Type));
-                else
-                    newArgument = factory.CreateArgument(ParameterKind.VALUE, factory.CreateExpression($"Arg.{Info.ArgSuffix}<$0>()", Info.Type));
-
+                var newArgument = _createArgumentFn(Info, factory);
                 addedArgument = argumentExpression.ReplaceBy(newArgument);
             }
             textControl.Caret.MoveTo(addedArgument.GetDocumentEndOffset().Shift(Info.InsertCaretOffset), CaretVisualPlacement.Generic);
