@@ -44,8 +44,10 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
 
             if (!(context.TerminatedContext.TreeNode?.GetContainingFile() is ICSharpFile cSharpFile))
                 return false;
+
             if (!cSharpFile.Imports.Any(i => i.ImportedSymbolName.QualifiedName == "NSubstitute"))
-                return false;
+                if (cSharpFile.GetProject()?.GetAllReferencedAssemblies().Any(x => x.Name == "NSubstitute") != true)
+                    return false;
 
             foreach (var expectedType in context.ExpectedTypesContext.ExpectedITypes)
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Application.Progress;
 using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.Assemblies.Interfaces;
 using JetBrains.ReSharper.Daemon.CSharp.Errors;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
 using JetBrains.ReSharper.Psi;
@@ -61,7 +62,7 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
             if (!(_objectCreationExpression.GetContainingTypeDeclaration() is IClassDeclaration classDeclaration))
                 return false;
 
-            if (!classDeclaration.CLRName.ToLowerInvariant().Contains("tests"))
+            if (_objectCreationExpression.GetProject()?.GetAllReferencedAssemblies().Any(x => x.Name == "NSubstitute") != true)
                 return false;
 
             _classDeclaration = classDeclaration;
