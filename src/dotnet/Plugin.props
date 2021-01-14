@@ -5,7 +5,7 @@
     <Title>NSubstituteComplete</Title>
     <Description>Provide quick fixes and smart autocomplete when using NSubstitute</Description>
 
-    <Authors>Bertrand Provost</Authors>
+    <Authors>Socolin</Authors>
     <Copyright>Copyright $([System.DateTime]::Now.Year) Maintainers of NSubstituteComplete</Copyright>
     <PackageTags>resharper plugin</PackageTags>
 
