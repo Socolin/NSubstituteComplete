@@ -14,8 +14,7 @@
   <change-notes>
     <![CDATA[
 <ul>
-<li>Improve when QuickFix and Completions are shown.</li>
-<li>Add new Completion: Suggest <span style="font-family: monospace">Substitute.For&lt;T&gt;</span></li>
+<li>New feature: MockAliases: Let you choose some if some types should not be mocked with `NSubstitute.For<>` but with another class instead `new T()`. Configured in Unit Testing Settings. See documentation for more details</li>
 </ul>
 ]]>
   </change-notes>
