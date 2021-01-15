@@ -2,17 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Application.Progress;
-using JetBrains.Application.Settings;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.DataContext;
 using JetBrains.ReSharper.Daemon.CSharp.Errors;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
-using JetBrains.ReSharper.I18n.Services;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Conversions;
 using JetBrains.ReSharper.Psi.CSharp.ExpectedTypes;
-using JetBrains.ReSharper.Psi.CSharp.Impl;
 using JetBrains.ReSharper.Psi.CSharp.Resolve;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.ExpectedTypes;
@@ -26,7 +22,6 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.TextControl;
 using JetBrains.Util;
-using JetBrains.Util.PaternMatching;
 using ReSharperPlugin.NSubstituteComplete.Options;
 
 namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
@@ -124,8 +119,9 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
                 .GetMockAliases();
 
             var arguments = new LocalList<ICSharpArgument>();
-            foreach (var parameter in targetConstructor.Parameters)
+            for (var argumentIndex = 0; argumentIndex < targetConstructor.Parameters.Count; argumentIndex++)
             {
+                var parameter = targetConstructor.Parameters[argumentIndex];
                 if (!(parameter.Type is DeclaredTypeBase declaredTypeBase))
                     continue;
 
@@ -139,10 +135,11 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
                     var (mockedType, useNSubstituteMock) = GetMockedType(declaredTypeBase, mockAliases);
                     var options = new SuggestionOptions(defaultName: declaredTypeBase.GetClrName().ShortName);
                     var fieldDeclaration = elementFactory.CreateTypeMemberDeclaration("private $0 $1;", mockedType, declaredTypeBase.GetClrName().ShortName);
+                    var expectedTypeConstraint = new CSharpImplicitlyConvertibleToConstraint(parameter.Type, cSharpTypeConversionRule, cSharpTypeConstraintsVerifier);
 
                     var fieldName = psiServices.Naming.Suggestion.GetDerivedName(fieldDeclaration.DeclaredElement, NamedElementKinds.PrivateInstanceFields, ScopeKind.Common, _classDeclaration.Language, options, psiSourceFile);
 
-                    var existingArgument = GetExistingArgument(parameter, fieldName, _objectCreationExpression);
+                    var existingArgument = GetExistingArgument(expectedTypeConstraint, fieldName, _objectCreationExpression, argumentIndex);
                     if (existingArgument != null)
                     {
                         arguments.Add(existingArgument);
@@ -163,7 +160,7 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
                     else
                         block.AddStatementAfter(initializeMockStatement, lastInitializedSubstitute);
 
-                    var argument = CreateValidArgument(elementFactory, new CSharpImplicitlyConvertibleToConstraint(parameter.Type, cSharpTypeConversionRule, cSharpTypeConstraintsVerifier), mockedType, fieldName, treeNode.GetPsiModule());
+                    var argument = CreateValidArgument(elementFactory, expectedTypeConstraint, mockedType, fieldName, treeNode.GetPsiModule());
                     arguments.Add(argument);
                 }
             }
@@ -273,23 +270,34 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
             return (parameterType, true);
         }
 
-        private ICSharpArgument GetExistingArgument(IParameter parameter, string fieldName, IObjectCreationExpression objectCreationExpression)
+        private ICSharpArgument GetExistingArgument(IExpectedTypeConstraint expectedTypeConstraint, string fieldName, IObjectCreationExpression objectCreationExpression, int argumentIndex)
         {
-            foreach (var argument in objectCreationExpression.ArgumentList.Arguments)
+            if (argumentIndex < objectCreationExpression.ArgumentList.Arguments.Count)
             {
-                if ((argument.Value as IReferenceExpression)?.NameIdentifier.Name == fieldName)
-                    return argument;
+                var currentArgument = objectCreationExpression.ArgumentList.Arguments.Skip(argumentIndex).First();
+                if (expectedTypeConstraint.Accepts(currentArgument.Value.Type()))
+                {
+                    return currentArgument;
+                }
             }
 
-            if (!(parameter.Type is DeclaredTypeBase parameterType))
-                return null;
-            var parameterTypeName = parameterType.GetClrName().FullName;
-            var matchingArguments = objectCreationExpression.ArgumentList.Arguments
-                .Where(arg => ((arg.Value as IReferenceExpression)?.Reference.Resolve().DeclaredElement.Type() as DeclaredTypeBase)?.GetClrName().FullName == parameterTypeName).ToList();
-            if (matchingArguments.Count != 1)
-                return null;
+            foreach (var argument in objectCreationExpression.ArgumentList.Arguments.Where(argument => (argument.Value as IReferenceExpression)?.NameIdentifier.Name == fieldName))
+            {
+                return argument;
+            }
 
-            return matchingArguments.Single();
+            var matchingArguments = objectCreationExpression.ArgumentList.Arguments
+                .Select((arg, i) => (argument: arg, argumentIndex: i))
+                .Where(a => expectedTypeConstraint.Accepts(a.argument.Value.Type()))
+                .ToList();
+            if (matchingArguments.Count == 0)
+                return null;
+            if (matchingArguments.Count != 1)
+                return matchingArguments.Single().argument;
+
+            return matchingArguments
+                .OrderBy(x => Math.Abs(x.argumentIndex - argumentIndex))
+                .First().argument;
         }
     }
 }
