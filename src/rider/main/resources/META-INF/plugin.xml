@@ -14,7 +14,7 @@
   <change-notes>
     <![CDATA[
 <ul>
-<li>New feature: MockAliases: Let you choose some if some types should not be mocked with `NSubstitute.For<>` but with another class instead `new T()`. Configured in Unit Testing Settings. See documentation for more details</li>
+<li>Improve "QuickFix: Generate missing arguments as mock" it will work better when trying to add new argument to an already mocked constructor.</li>
 </ul>
 ]]>
   </change-notes>
