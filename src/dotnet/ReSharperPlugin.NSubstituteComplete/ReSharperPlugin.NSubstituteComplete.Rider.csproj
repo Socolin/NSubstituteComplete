@@ -18,6 +18,12 @@
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(SdkVersion)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="PresentationCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\..\..\..\..\.nuget\packages\microsoft.netframework.referenceassemblies.net461\1.0.0-preview.2\build\.NETFramework\v4.6.1\PresentationCore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <!-- TODO: uncomment for xaml icons -->
   <!--<ItemGroup>-->
     <!--<Reference Include="System.Xaml" />-->
