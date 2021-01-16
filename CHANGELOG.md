@@ -19,10 +19,10 @@ Improve "QuickFix: Generate missing arguments as mock" it will work better when 
 
 ## 1.2.0 - 2020.01-14
 - Add new Completion: Suggest `Substitute.For<>`
-- Improve condition when Quick fix and Completions are shown. It now check for `NSubstitute` assembly.
+- Improve condition when Quick fix and Completions are shown. It now checks for `NSubstitute` assembly.
 
 ## 1.1.0 - 2020-01-12
-- Improve "QuickFix: Generate missing arguments as mock" now it add mock initializer with the others.
+- Improve "QuickFix: Generate missing arguments as mock" now it adds mock initializer with the others.
 - Improve "Completion: Auto fill argument with `Arg.Any` `Arg.Is`". Automatically add missing `using` when referencing a type. Also improved when it's proposed
 
 ## 1.0.0 - 2020-01-05

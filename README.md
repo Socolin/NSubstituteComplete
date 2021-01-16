@@ -50,7 +50,7 @@ Thanks to all the people on the `#dotnet-pluginwriters` Slack channel for their 
 
 ## Other plugins that may interest you
 
-|Rider | Resharper |
-|-----|------|
-|[RenameRelatedTests](https://plugins.jetbrains.com/plugin/15795-renamerelatedtests)|[RenameRelatedTests](https://plugins.jetbrains.com/plugin/15800-renamerelatedtests)|
-|[AutocompleteTestStrings](https://plugins.jetbrains.com/plugin/15796-autocompleteteststrings)|[AutocompleteTestStrings](https://plugins.jetbrains.com/plugin/15802-autocompleteteststrings)|
+| Plugin |Rider | Resharper |
+|-----|-----|------|
+| RenameRelatedTests |[![RenameRelatedTestsRirder](https://img.shields.io/jetbrains/plugin/v/15795)](https://plugins.jetbrains.com/plugin/15795-renamerelatedtests)|[![RenameRelatedTestsResharper](https://img.shields.io/resharper/v/ReSharperPlugin.RenameRelatedTests)](https://plugins.jetbrains.com/plugin/15800-renamerelatedtests)|
+| AutocompleteTestStrings |[![AutocompleteTestStringsRider](https://img.shields.io/jetbrains/plugin/v/15796)](https://plugins.jetbrains.com/plugin/15796-autocompleteteststrings)|[![AutocompleteTestStringsRider](https://img.shields.io/resharper/v/ReSharperPlugin.AutocompleteTestStrings)](https://plugins.jetbrains.com/plugin/15802-autocompleteteststrings)|
