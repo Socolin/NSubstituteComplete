@@ -132,10 +132,10 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
                 }
                 else
                 {
-                    var (mockedType, useNSubstituteMock) = GetMockedType(declaredTypeBase, mockAliases);
-                    var options = new SuggestionOptions(defaultName: declaredTypeBase.GetClrName().ShortName);
-                    var fieldDeclaration = elementFactory.CreateTypeMemberDeclaration("private $0 $1;", mockedType, declaredTypeBase.GetClrName().ShortName);
                     var expectedTypeConstraint = new CSharpImplicitlyConvertibleToConstraint(parameter.Type, cSharpTypeConversionRule, cSharpTypeConstraintsVerifier);
+                    var options = new SuggestionOptions(defaultName: declaredTypeBase.GetClrName().ShortName);
+                    var (mockedType, useNSubstituteMock) = GetMockedType(declaredTypeBase, mockAliases, expectedTypeConstraint);
+                    var fieldDeclaration = elementFactory.CreateTypeMemberDeclaration("private $0 $1;", mockedType, declaredTypeBase.GetClrName().ShortName);
 
                     var fieldName = psiServices.Naming.Suggestion.GetDerivedName(fieldDeclaration.DeclaredElement, NamedElementKinds.PrivateInstanceFields, ScopeKind.Common, _classDeclaration.Language, options, psiSourceFile);
 
@@ -203,69 +203,64 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
             return elementFactory.CreateArgument(ParameterKind.VALUE, elementFactory.CreateExpression("$0", fieldName));
         }
 
-        private static (IType mockedType, bool useNSubstituteMock) GetMockedType(DeclaredTypeBase parameterType, Dictionary<string, string> mockAliases)
+        private static (IType mockedType, bool useNSubstituteMock) GetMockedType(
+            DeclaredTypeBase parameterType,
+            Dictionary<string, List<(string TargetTypeExpression, string ClrMockedType)>> mockAliases,
+            CSharpImplicitlyConvertibleToConstraint expectedType
+        )
         {
             var parameterTypeFullName = parameterType.GetClrName().FullName;
 
-            if (mockAliases.TryGetValue(parameterTypeFullName, out var aliasType))
+            if (mockAliases.TryGetValue(parameterTypeFullName, out var aliasTypes))
             {
-                var type = TypeFactory.CreateTypeByCLRName(aliasType, parameterType.Module);
-                var typeElement = type.GetTypeElement();
-                if (typeElement != null
-                    && parameterType.GetClrName().TypeParametersCount == type.GetClrName().TypeParametersCount
-                    && parameterType.GetClrName().TypeParametersCount > 0)
+                if (aliasTypes.Count == 1)
                 {
-                    var dictionary = new Dictionary<ITypeParameter, IType>();
-                    var fromDictionary = parameterType.GetSubstitution().ToDictionary();
-                    foreach (var typeParameter in typeElement.GetAllTypeParameters())
+                    var aliasType = aliasTypes.Single();
+                    var type = TypeFactory.CreateTypeByCLRName(aliasType.ClrMockedType, parameterType.Module);
+                    var typeElement = type.GetTypeElement();
+                    if (typeElement != null
+                        && parameterType.GetClrName().TypeParametersCount == type.GetClrName().TypeParametersCount
+                        && parameterType.GetClrName().TypeParametersCount > 0)
                     {
-                        dictionary[typeParameter] = fromDictionary.Single(x => x.Key.Index == typeParameter.Index).Value;
-                    }
-
-                    return (TypeFactory.CreateType(typeElement, EmptySubstitution.INSTANCE.Extend(dictionary), type.NullableAnnotation), false);
-                }
-
-                if (typeElement != null
-                    && parameterType.GetClrName().TypeParametersCount == 0 && type.GetClrName().TypeParametersCount == 1)
-                {
-                    var dictionary = new Dictionary<ITypeParameter, IType>();
-                    foreach (var typeParameter in typeElement.GetAllTypeParameters())
-                    {
-                        dictionary[typeParameter] = parameterType;
-                    }
-
-                    return (TypeFactory.CreateType(typeElement, EmptySubstitution.INSTANCE.Extend(dictionary), type.NullableAnnotation), false);
-                }
-
-                return (type, false);
-            }
-
-            /*
-            var typeElement = parameterType.GetTypeElement();
-            if (parameterType.GetClrName().TypeParametersCount > 0 && typeElement != null)
-            {
-                var parameterTypeString = "<" + string.Join(",", typeElement.TypeParameters.Select(t => t.ShortName)) + ">";
-                var buildType = "<" + string.Join(",", typeElement.TypeParameters.Select(t => t.ShortName)) + ">";
-                var parameterNameWithGenericTypes = parameterTypeFullName.Replace("`" + parameterType.GetClrName().TypeParametersCount, parameterTypeString);
-
-                if (parameterTypeFullName.Contains('`'))
-                    if (mockAliases.TryGetValue(parameterNameWithGenericTypes, out var aliasTypeFromGeneric))
-                    {
-                        var aliasGenericIndex = aliasTypeFromGeneric.IndexOf('<');
-                        if (aliasGenericIndex != -1)
+                        var dictionary = new Dictionary<ITypeParameter, IType>();
+                        var fromDictionary = parameterType.GetSubstitution().ToDictionary();
+                        foreach (var typeParameter in typeElement.GetAllTypeParameters())
                         {
-                            var typeByClrName = TypeFactory.CreateTypeByCLRName(aliasTypeFromGeneric, parameterType.Module);
-                            aliasTypeFromGeneric = aliasTypeFromGeneric.Remove(aliasGenericIndex) + "`" + ;
-                                                parameterType.GetSubstitution().Apply(TypeFactory.CreateTypeByCLRName("TestProject1.FakeDep6`2", parameterType.Module))
-
-                            aliasTypeFromGeneric.Remove(aliasGenericIndex) + "`" + ;
-                            return (typeByClrName, false);
-
+                            dictionary[typeParameter] = fromDictionary.Single(x => x.Key.Index == typeParameter.Index).Value;
                         }
-                        return (TypeFactory.CreateTypeByCLRName(aliasTypeFromGeneric, parameterType.Module), false);
+
+                        return (TypeFactory.CreateType(typeElement, EmptySubstitution.INSTANCE.Extend(dictionary), type.NullableAnnotation), false);
                     }
+
+                    if (typeElement != null
+                        && parameterType.GetClrName().TypeParametersCount == 0 && type.GetClrName().TypeParametersCount == 1)
+                    {
+                        var dictionary = new Dictionary<ITypeParameter, IType>();
+                        foreach (var typeParameter in typeElement.GetAllTypeParameters())
+                        {
+                            dictionary[typeParameter] = parameterType;
+                        }
+
+                        return (TypeFactory.CreateType(typeElement, EmptySubstitution.INSTANCE.Extend(dictionary), type.NullableAnnotation), false);
+                    }
+
+                    return (type, false);
+                }
+
+                foreach (var (targetTypeExpression, clrMockedType) in aliasTypes)
+                {
+                    var targetType = TypeHelper.ParseGenericType(targetTypeExpression, parameterType.Module);
+                    if (expectedType.Accepts(targetType))
+                        return (TypeFactory.CreateTypeByCLRName(clrMockedType, parameterType.Module), false);
+                }
+
+                foreach (var aliasType in aliasTypes)
+                {
+                    var type = TypeFactory.CreateTypeByCLRName(aliasType.ClrMockedType, parameterType.Module);
+                    if (expectedType.Accepts(type))
+                        return (type, false);
+                }
             }
-            */
 
             return (parameterType, true);
         }

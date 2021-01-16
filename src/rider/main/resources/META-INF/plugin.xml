@@ -14,7 +14,7 @@
   <change-notes>
     <![CDATA[
 <ul>
-<li>Improve "QuickFix: Generate missing arguments as mock" it will work better when trying to add new argument to an already mocked constructor.</li>
+<li>Improve Mock aliases. Support more complex scenario with Mock Aliases.</li>
 </ul>
 ]]>
   </change-notes>

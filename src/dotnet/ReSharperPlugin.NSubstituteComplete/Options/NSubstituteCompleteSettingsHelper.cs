@@ -18,17 +18,33 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
             return contextBoundSettingsStore.GetKey<NSubstituteCompleteSettings>(settingsOptimization);
         }
 
-        public static Dictionary<string, string> GetMockAliases(this NSubstituteCompleteSettings settings)
+        public static Dictionary<string, List<(string TargetTypeExpression, string ClrMockedType)>> GetMockAliases(this NSubstituteCompleteSettings settings)
         {
-            return settings.MockAliases
+            var rawAliases = settings.MockAliases
                 .Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Split(new[] {'='}, 2))
-                .Where(x => x.Length == 2)
-                .Select(x => new[] {ReplaceGenericTypeWithRiderNotation(x[0]), ReplaceGenericTypeWithRiderNotation(x[1])})
-                .ToDictionary(x => x[0], x => x[1]);
+                .Where(x => x.Length == 2);
+
+            var aliases = new Dictionary<string, List<(string TargetTypeExpression, string ClrMockedType)>>();
+            foreach (var alias in rawAliases)
+            {
+                var targetType = alias[0];
+                var mockedType = alias[1];
+
+                var targetTypeClr = GetAsClrTypeName(targetType);
+                if (!aliases.TryGetValue(targetTypeClr, out var aliasDefinitions))
+                {
+                    aliasDefinitions = new List<(string TargetTypeExpression, string ClrMockedType)>();
+                    aliases.Add(targetTypeClr, aliasDefinitions);
+                }
+
+                aliasDefinitions.Add((targetType, GetAsClrTypeName(mockedType)));
+            }
+
+            return aliases;
         }
 
-        private static string ReplaceGenericTypeWithRiderNotation(string type)
+        private static string GetAsClrTypeName(string type)
         {
             var genericMarkerIndex = type.IndexOf('<');
             if (genericMarkerIndex == -1)

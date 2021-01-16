@@ -20,9 +20,21 @@ A Rider / Resharper Plugin that provide quick fixes and smart autocomplete when 
 
 ### Mock aliases
 
-This quick fix support the "Mock Aliases" feature. This allow you to define (In the _Unit Testing Settings_ panel) a list of type that should not be mocked with `Substitute.For<>` but with an explicit type instead. This is useful for complex type that required a lot of mocking.
+This quick fix support the "Mock Aliases" feature. This allows you to define (In the _Unit Testing Settings_ panel) a list of type that should not be mocked with `Substitute.For<>` but with an explicit type instead. This is useful for complex type that required a lot of mocking.
 
 Here an [example](https://github.com/Socolin/NaheulbookBackend/blob/master/Naheulbook.Core.Tests.Unit/TestUtils/FakeUnitOfWorkFactory.cs) of such a type
+
+Example of configuration
+```c#
+IDep1 => FakeDep1()
+IDep2<T> = FakeDep2()
+IDep3<T> = FakeDep3<T>
+IDep4 = FakeDep4<T>
+IGenericDep<IDep1> = FakeGenericDep1()
+IGenericDep<IDep2> = FakeGenericDep2()
+```
+
+If the `Fake` class does not match `IDep` it will search into the members of the `Fake` class a matching member.
 
 [![Mock Aliases example](doc/images/MockedAliases.gif)](doc/images/MockedAliases.gif)
 
@@ -34,7 +46,7 @@ Here an [example](https://github.com/Socolin/NaheulbookBackend/blob/master/Naheu
 ## Notes
 
 This plugin was inspired by [MoqComplete](https://github.com/Abc-Arbitrage/Abc.MoqComplete).
-Thanks to all the people on the `#dotnet-pluginwriters` slack channel for their help !
+Thanks to all the people on the `#dotnet-pluginwriters` Slack channel for their help !
 
 ## Other plugins that may interest you
 
