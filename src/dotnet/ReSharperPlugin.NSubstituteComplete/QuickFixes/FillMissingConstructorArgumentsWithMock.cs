@@ -107,16 +107,14 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
             var psiSourceFile = treeNode.GetSourceFile();
             var cSharpTypeConversionRule = treeNode.GetTypeConversionRule();
             var cSharpTypeConstraintsVerifier = new CSharpTypeConstraintsVerifier(treeNode.GetCSharpLanguageLevel(), cSharpTypeConversionRule);
+            var mockAliases = NSubstituteCompleteSettingsHelper.GetSettings(solution)
+                .GetMockAliases();
 
             var lastInitializedSubstitute = block
                 .Children()
                 .OfType<IExpressionStatement>()
                 .Where(statement => statement.GetTreeStartOffset().Offset < _objectCreationExpression.GetContainingStatement().GetTreeStartOffset().Offset)
-                .Where(statement => statement.Expression.Children().OfType<IInvocationExpression>().FirstOrDefault()?.GetText().StartsWith("Substitute.For") == true)
-                .LastOrDefault();
-
-            var mockAliases = NSubstituteCompleteSettingsHelper.GetSettings(solution)
-                .GetMockAliases();
+                .LastOrDefault(statement => IsMockInitializer(statement, mockAliases));
 
             var arguments = new LocalList<ICSharpArgument>();
             for (var argumentIndex = 0; argumentIndex < targetConstructor.Parameters.Count; argumentIndex++)
@@ -173,6 +171,21 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
                 _objectCreationExpression.AddArgumentAfter(argument, null);
 
             return _ => { };
+        }
+
+        private static bool IsMockInitializer(IExpressionStatement statement, Dictionary<string, List<(string TargetTypeExpression, string ClrMockedType)>> mockAliases)
+        {
+            var invocationExpression = statement.Expression.Children().OfType<IInvocationExpression>().FirstOrDefault();
+            if (invocationExpression != null)
+                if (invocationExpression.GetText().StartsWith("Substitute.For"))
+                    return true;
+
+            var objectCreationExpression = statement.Expression.Children().OfType<IObjectCreationExpression>().FirstOrDefault();
+            if (objectCreationExpression?.Type() is DeclaredTypeBase declaredTypeBase)
+                if (mockAliases.Values.SelectMany(a => a).Any(a => a.ClrMockedType == declaredTypeBase.GetClrName().FullName))
+                    return true;
+
+            return false;
         }
 
         private ICSharpArgument CreateValidArgument(CSharpElementFactory elementFactory, IExpectedTypeConstraint expectedTypeConstraint, IType mockedType, string fieldName, IPsiModule module)
