@@ -3,20 +3,15 @@ using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Application.UI.Options;
 using JetBrains.Application.UI.Options.OptionsDialog;
-using JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions;
-using JetBrains.Application.UI.UIAutomation;
-using JetBrains.DataFlow;
 using JetBrains.IDE.UI;
 using JetBrains.IDE.UI.Extensions;
 using JetBrains.IDE.UI.Extensions.Properties;
-using JetBrains.IDE.UI.Options;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.UI.Automation;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.ReSharper.UnitTestFramework.UI.Options.ViewModel;
-using JetBrains.Rider.Model;
 using JetBrains.Rider.Model.UIAutomation;
 
 namespace ReSharperPlugin.NSubstituteComplete.Options
@@ -34,7 +29,7 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
         private const string PageTitle = "NSubstiteComplete";
 
         public NSubstituteCompleteOptionPage(
-            [NotNull] Lifetime lifetime,
+            Lifetime lifetime,
             [NotNull] OptionsSettingsSmartContext smartContext,
             [NotNull] OptionsPageContext pageContext,
             [NotNull] IconHostBase iconHost,

@@ -3,9 +3,9 @@ using System.Text;
 using JetBrains.ReSharper.Psi.JavaScript.Util.Literals;
 using JetBrains.Util;
 
-namespace ReSharperPlugin.NSubstituteComplete
+namespace ReSharperPlugin.NSubstituteComplete.Helpers
 {
-    public class TextUtil
+    public class TextHelper
     {
         public static string ToKebabCase(string input)
         {

@@ -22,6 +22,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.TextControl;
 using JetBrains.Util;
+using ReSharperPlugin.NSubstituteComplete.Helpers;
 using ReSharperPlugin.NSubstituteComplete.Options;
 
 namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
@@ -125,7 +126,7 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
 
                 if (declaredTypeBase.GetClrName().FullName == "System.String")
                 {
-                    var argument = elementFactory.CreateArgument(ParameterKind.VALUE, elementFactory.CreateExpression("$0", $@"""some-{TextUtil.ToKebabCase(parameter.ShortName)}"""));
+                    var argument = elementFactory.CreateArgument(ParameterKind.VALUE, elementFactory.CreateExpression("$0", $@"""some-{TextHelper.ToKebabCase(parameter.ShortName)}"""));
                     arguments.Add(argument);
                 }
                 else

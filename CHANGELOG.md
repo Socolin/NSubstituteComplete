@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## 1.3.3 - 2020.01-16
+## 1.3.3 - ...
 - Improve "QuickFix: Generate missing arguments as mock", when adding a new mock, mock aliases are not ignored anymore when looking for the last mock initializer, so mock initializer will place placed after the other one instead of some unrelated location in some scenario
 
 Before (After adding `_dep3`):
