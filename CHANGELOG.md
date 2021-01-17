@@ -26,6 +26,33 @@ _dep3 = Substitute.For<IDep3>();
 _service = new Service(_dep1, _dep2, _dep3)
 ```
 
+- Improve "QuickFix: Generate missing arguments as mock": It will only apply changes to the constructor instead of overwriting the constructor invocation.
+
+This following code, when using quickFix to add `_dep9`:
+
+```c#
+_service = new Service(
+    _dep1,
+#pragma warning disable 618
+    _dep2,
+#pragma warning restore 618
+    _dep3, _dep4, _dep5, _dep6, _dep7.Object);
+```
+Was transformed to:
+```c#
+_service = new Service(_dep1, _dep2, _dep3, _dep4, _dep5, _dep6, _dep7.Object, _dep9);
+```
+Now it will be transformed to:
+```c#
+_service = new Service(
+    _dep1,
+#pragma warning disable 618
+    _dep2,
+#pragma warning restore 618
+    _dep3, _dep4, _dep5, _dep6, _dep7.Object, _dep9);
+```
+
+
 ## 1.3.2 - 2020.01-16
 - Improve Mock aliases. Support more complex scenario with Mock Aliases. As following example
 ```c#

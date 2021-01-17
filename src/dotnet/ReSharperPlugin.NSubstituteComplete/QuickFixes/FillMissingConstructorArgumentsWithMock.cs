@@ -115,7 +115,7 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
                 .Children()
                 .OfType<IExpressionStatement>()
                 .Where(statement => statement.GetTreeStartOffset().Offset < _objectCreationExpression.GetContainingStatement().GetTreeStartOffset().Offset)
-                .LastOrDefault(statement => IsMockInitializer(statement, mockAliases));
+                .LastOrDefault(statement => IsMockInitializer(statement, mockAliases)) as ICSharpStatement;
 
             var arguments = new LocalList<ICSharpArgument>();
             for (var argumentIndex = 0; argumentIndex < targetConstructor.Parameters.Count; argumentIndex++)
@@ -157,19 +157,25 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
                     if (lastInitializedSubstitute == null)
                         block.AddStatementBefore(initializeMockStatement, _objectCreationExpression.GetContainingStatement());
                     else
-                        block.AddStatementAfter(initializeMockStatement, lastInitializedSubstitute);
+                        lastInitializedSubstitute = block.AddStatementAfter(initializeMockStatement, lastInitializedSubstitute);
 
                     var argument = CreateValidArgument(elementFactory, expectedTypeConstraint, mockedType, fieldName, treeNode.GetPsiModule());
                     arguments.Add(argument);
                 }
             }
 
-            arguments.Reverse();
             foreach (var oldArgument in _objectCreationExpression.ArgumentList.Arguments)
-                _objectCreationExpression.RemoveArgument(oldArgument);
+                if (!arguments.Contains(oldArgument))
+                    _objectCreationExpression.RemoveArgument(oldArgument);
 
+            ICSharpArgument previousArgument = null;
             foreach (var argument in arguments)
-                _objectCreationExpression.AddArgumentAfter(argument, null);
+            {
+                if (!_objectCreationExpression.ArgumentList.Arguments.Contains(argument))
+                    previousArgument = _objectCreationExpression.AddArgumentAfter(argument, previousArgument);
+                else
+                    previousArgument = argument;
+            }
 
             return _ => { };
         }
