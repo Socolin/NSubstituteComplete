@@ -7,6 +7,7 @@ using JetBrains.Application.UI.Options.OptionsDialog;
 using JetBrains.IDE.UI;
 using JetBrains.IDE.UI.Extensions;
 using JetBrains.IDE.UI.Extensions.Properties;
+using JetBrains.IDE.UI.Options;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.UI.Automation;
@@ -24,27 +25,29 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
         NestingType = OptionPageNestingType.Inline,
         IsAlignedWithParent = true,
         Sequence = 0.1d)]
-    public class NSubstituteCompleteOptionPage : CustomSimpleOptionsPage
+    public class NSubstituteCompleteOptionPage : BeSimpleOptionsPage
     {
         private new const string Id = nameof(NSubstituteCompleteOptionPage);
         private const string PageTitle = "NSubstiteComplete";
 
         public NSubstituteCompleteOptionPage(
             Lifetime lifetime,
+            [NotNull] OptionsPageContext optionsPageContext,
+            [NotNull] OptionsSettingsSmartContext optionsSettingsSmartContext,
             [NotNull] OptionsSettingsSmartContext smartContext,
             [NotNull] OptionsPageContext pageContext,
             [NotNull] IconHostBase iconHost,
             [NotNull] IShellLocks locks,
-            [NotNull] Optional<ISolution> solution,
+            [NotNull] IComponentContainer componentContainer,
             bool wrapInScrollablePanel = false
         )
-            : base(lifetime, smartContext)
+            : base(lifetime, optionsPageContext, optionsSettingsSmartContext, wrapInScrollablePanel)
         {
             AddHeader("NSubstituteComplete");
-            AddCustomOption(MockAliases(lifetime, smartContext, pageContext, iconHost, locks, solution.CanBeNull));
+            AddControl(MockAliases(lifetime, smartContext, pageContext, iconHost, locks, componentContainer.TryGetComponent<ISolution>()));
         }
 
-        private BeControl MockAliases(
+        private static BeControl MockAliases(
             Lifetime lifetime,
             OptionsSettingsSmartContext smartContext,
             OptionsPageContext pageContext,
