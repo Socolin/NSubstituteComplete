@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using JetBrains.Application.BuildScript.Application.Zones;
+using JetBrains.Application.Environment;
 using JetBrains.ReSharper.TestFramework;
 using JetBrains.TestFramework;
 using JetBrains.TestFramework.Application.Zones;
@@ -9,13 +10,19 @@ using NUnit.Framework;
 
 namespace ReSharperPlugin.NSubstituteComplete.Tests
 {
-  [ZoneDefinition]
-  public interface INSubstituteCompleteTestZone : ITestsEnvZone, IRequire<PsiFeatureTestZone>
-  {
-  }
+    [ZoneDefinition]
+    public interface INSubstituteCompleteTestZone : ITestsEnvZone, IRequire<PsiFeatureTestZone>
+    {
+    }
 
-  [SetUpFixture]
-  public class TestEnvironment : ExtensionTestEnvironmentAssembly<INSubstituteCompleteTestZone>
-  {
-  }
+    [ZoneActivator]
+    public class PsiFeatureTestZoneActivator : IActivate<PsiFeatureTestZone>
+    {
+        public bool ActivatorEnabled() => true;
+    }
+
+    [SetUpFixture]
+    public class TestEnvironment : ExtensionTestEnvironmentAssembly<INSubstituteCompleteTestZone>
+    {
+    }
 }

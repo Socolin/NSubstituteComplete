@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="JetBrains.Platform.Core.Shell" Version="203.0.20201229.110723" />
     <PackageReference Include="JetBrains.ReSharper.SDK.Tests" Version="$(SdkVersion)" />
+    <PackageReference Include="NSubstitute" Version="4.2.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,6 +17,16 @@
 
   <ItemGroup>
     <Compile Remove="test/**/*" />
+    <None Include="test\data\CSharp\QuickFixes\FillMissingConstructorArgumentsWithMock\FillLastArg_AddAfterLastMock.cs" />
+    <None Include="test\data\CSharp\QuickFixes\FillMissingConstructorArgumentsWithMock\FillFromEmpty_Simple01.cs" />
+    <None Include="test\data\CSharp\QuickFixes\FillMissingConstructorArgumentsWithMock\FillFromEmpty_Simple02.cs" />
+    <None Include="test\data\CSharp\QuickFixes\FillMissingConstructorArgumentsWithMock\FillLastArg_ComplexAliases.cs" />
+    <None Include="test\data\CSharp\QuickFixes\FillMissingConstructorArgumentsWithMock\MockAlias01.cs" />
+    <None Include="test\data\CSharp\QuickFixes\FillMissingConstructorArgumentsWithMock\MockAlias02.cs" />
+    <None Include="test\data\CSharp\QuickFixes\FillMissingConstructorArgumentsWithMock\MockAlias03.cs" />
+    <None Include="test\data\CSharp\QuickFixes\FillMissingConstructorArgumentsWithMock\MockAlias04.cs" />
+    <None Include="test\data\CSharp\QuickFixes\FillMissingConstructorArgumentsWithMock\MockAlias05_UseMatchingField.cs" />
+    <None Include="test\data\CSharp\QuickFixes\FillMissingConstructorArgumentsWithMock\MockAlias06_MultipleMock.cs" />
   </ItemGroup>
 
 </Project>

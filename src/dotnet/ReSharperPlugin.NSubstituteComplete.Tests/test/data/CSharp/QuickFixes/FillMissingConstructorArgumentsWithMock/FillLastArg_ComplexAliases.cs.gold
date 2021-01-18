@@ -1,0 +1,91 @@
+using System;
+using System.Runtime.Intrinsics.Arm;
+using NSubstitute;
+using NUnit.Framework;
+
+public class FakeDep3 : IDep3<string> { }
+public class FakeDep4 : IDep4 { }
+public class FakeDep5<T> : IDep5 where T : class { }
+public class FakeDep6<TKey, TValue> : IDep6<TKey, TValue> { }
+public class FakeDep7 { public IDep7 Object; }
+public class FakeDep91 : IDep9<IDep1> { }
+public class FakeDep92 : IDep9<IDep2> { }
+
+public interface IDep1 { }
+public interface IDep2 { }
+public interface IDep3<T> where T : class { }
+public interface IDep4 { }
+public interface IDep5 { }
+public interface IDep6<TKey, TValue>{ }
+public interface IDep7 { }
+public interface IDep8 { }
+public interface IDep9<T> where T : class { }
+
+public class Service
+{
+    private readonly IDep1 _dep1;
+    private readonly IDep2 _dep2;
+    private readonly IDep3<string> _dep3;
+    private readonly IDep4 _dep4;
+    private readonly IDep5 _dep5;
+    private readonly IDep6<string, int> _dep6;
+    private readonly IDep7 _dep7;
+    private readonly IDep9<IDep2> _dep9;
+
+    public Service(
+        IDep1 dep1,
+        IDep2 dep2,
+        IDep3<string> dep3,
+        IDep4 dep4,
+        IDep5 dep5,
+        IDep6<string, int> dep6,
+        IDep7 dep7,
+        IDep9<IDep2> dep9
+    )
+    {
+        _dep1 = dep1;
+        _dep2 = dep2;
+        _dep3 = dep3;
+        _dep4 = dep4;
+        _dep5 = dep5;
+        _dep6 = dep6;
+        _dep7 = dep7;
+        _dep9 = dep9;
+    }
+}
+
+public class ServiceTests
+{
+    private Service _service;
+    private IDep1 _dep1;
+    [Obsolete("Some message")]
+    private IDep2 _dep2;
+    private FakeDep3 _dep3;
+    private FakeDep4 _dep4;
+    private FakeDep7 _dep7;
+    private FakeDep5<IDep5> _dep5;
+    private FakeDep6<string, int> _dep6;
+    private FakeDep92 _dep9;
+
+    [SetUp]
+    public void Setup()
+    {
+        _dep1 = Substitute.For<IDep1>();
+        _dep2 = Substitute.For<IDep2>();
+        _dep3 = new FakeDep3();
+        _dep4 = new FakeDep4();
+        _dep5 = new FakeDep5<IDep5>();
+        _dep6 = new FakeDep6<string, int>();
+        _dep7 = new FakeDep7();
+        _dep9 = new FakeDep92();
+
+        var a = "a";
+
+        _service = new Service(
+            _dep1,
+#pragma warning disable 618
+            _dep2,
+#pragma warning restore 618
+            _dep3, _dep4, _dep5, _dep6, _dep7.Object, _dep9{caret});
+    }
+}
