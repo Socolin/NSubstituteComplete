@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Application.Components;
 using JetBrains.Application.Threading;
 using JetBrains.Application.UI.Options;
 using JetBrains.Application.UI.Options.OptionsDialog;
@@ -34,13 +35,13 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
             [NotNull] OptionsPageContext pageContext,
             [NotNull] IconHostBase iconHost,
             [NotNull] IShellLocks locks,
-            [CanBeNull] ISolution solution,
+            [NotNull] Optional<ISolution> solution,
             bool wrapInScrollablePanel = false
         )
             : base(lifetime, smartContext)
         {
             AddHeader("NSubstituteComplete");
-            AddCustomOption(MockAliases(lifetime, smartContext, pageContext, iconHost, locks, solution));
+            AddCustomOption(MockAliases(lifetime, smartContext, pageContext, iconHost, locks, solution.CanBeNull));
         }
 
         private BeControl MockAliases(
