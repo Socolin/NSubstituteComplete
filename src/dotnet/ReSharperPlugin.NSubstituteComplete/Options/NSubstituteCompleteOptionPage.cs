@@ -25,7 +25,7 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
         Sequence = 0.1d)]
     public class NSubstituteCompleteOptionPage : CustomSimpleOptionsPage
     {
-        private const string Id = nameof(NSubstituteCompleteOptionPage);
+        private new const string Id = nameof(NSubstituteCompleteOptionPage);
         private const string PageTitle = "NSubstiteComplete";
 
         public NSubstituteCompleteOptionPage(
@@ -34,7 +34,7 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
             [NotNull] OptionsPageContext pageContext,
             [NotNull] IconHostBase iconHost,
             [NotNull] IShellLocks locks,
-            ISolution solution,
+            [CanBeNull] ISolution solution,
             bool wrapInScrollablePanel = false
         )
             : base(lifetime, smartContext)
@@ -49,7 +49,7 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
             OptionsPageContext pageContext,
             IconHostBase iconHost,
             IShellLocks locks,
-            ISolution solution
+            [CanBeNull] ISolution solution
         )
         {
             var model = new MockAliasesModel(lifetime, smartContext);
@@ -57,8 +57,8 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
                     lifetime,
                     (entryLt, line, properties) => new List<BeControl>
                     {
-                        line.Name.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
-                        line.Value.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance)
+                        solution == null ? line.Name.GetBeTextBox(entryLt) : line.Name.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
+                        solution == null ? line.Value.GetBeTextBox(entryLt) : line.Value.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance)
                     },
                     iconHost,
                     new[] {"Type (interface),*", "Alias,*"},

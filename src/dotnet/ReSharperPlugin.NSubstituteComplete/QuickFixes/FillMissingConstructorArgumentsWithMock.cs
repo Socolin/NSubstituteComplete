@@ -114,7 +114,7 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
             var lastInitializedSubstitute = block
                 .Children()
                 .OfType<IExpressionStatement>()
-                .Where(statement => statement.GetTreeStartOffset().Offset < _objectCreationExpression.GetContainingStatement().GetTreeStartOffset().Offset)
+                .Where(statement => statement.GetTreeStartOffset().Offset < _objectCreationExpression.GetContainingStatement()?.GetTreeStartOffset().Offset)
                 .LastOrDefault(statement => IsMockInitializer(statement, mockAliases)) as ICSharpStatement;
 
             var arguments = new LocalList<ICSharpArgument>();
