@@ -11,12 +11,6 @@
 <p>Provide quick fixes and smart autocomplete when using NSubstitute</p>
 ]]>
   </description>
-  <change-notes>
-    <![CDATA[
-<ul>
-<li>Improve Quick Fix. See Changelog in documentation for more details.</li>
-</ul>
-]]>
-  </change-notes>
+  <change-notes></change-notes>
 
 </idea-plugin>
