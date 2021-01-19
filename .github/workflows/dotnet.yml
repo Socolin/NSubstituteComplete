@@ -1,0 +1,32 @@
+name: .NET
+
+on:
+  push:
+    branches: [ CI ]
+  pull_request:
+    branches: [ CI ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Build plugin
+      uses: eskatos/gradle-command-action@v1.3.3
+      with:
+        arguments: :buildPlugin --stacktrace -p:intellijPublishToken=none
+    - name: Test
+      run: dotnet test src/dotnet/ReSharperPlugin.NSubstituteComplete.Tests/ReSharperPlugin.NSubstituteComplete.Tests.csproj
+    - name: dotnet-tests-report
+      # You may pin to the exact commit or the version.
+      # uses: zyborg/dotnet-tests-report@6e6bc7c1e95ea9ab82de8d5c7eb2f9ca5db0a593
+      uses: zyborg/dotnet-tests-report@v1.3.0
+      with:
+        project_path: rc/dotnet/ReSharperPlugin.NSubstituteComplete.Tests/ReSharperPlugin.NSubstituteComplete.Tests.csproj
+
