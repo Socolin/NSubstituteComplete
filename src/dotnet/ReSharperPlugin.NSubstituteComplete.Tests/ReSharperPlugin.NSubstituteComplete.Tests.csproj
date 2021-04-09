@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Platform.Core.Shell" Version="203.0.20201229.110723" />
     <PackageReference Include="JetBrains.ReSharper.SDK.Tests" Version="$(SdkVersion)" />
     <PackageReference Include="NSubstitute" Version="4.2.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
