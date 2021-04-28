@@ -68,8 +68,7 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
                     new[] {"Type (interface),*", "Alias,*"},
                     dock: BeDock.RIGHT)
                 .AddButtonWithListAction(BeListAddAction.ADD, i => model.GetNewEntry(), customTooltip: "Add")
-                .AddButtonWithListAction<DictionaryModel<string, string>.Scalar>(BeListAction.REMOVE, i => model.RemoveSelectedEntry(), customTooltip: "Remove");
-
+                .AddButtonWithListAction<DictionaryModel<string, string>.Entry>(BeListAction.REMOVE, i => model.RemoveSelectedEntry(), customTooltip: "Remove");
             if (!pageContext.IsRider)
                 beToolbar.BindToLocalProtocol(lifetime, locks);
 
