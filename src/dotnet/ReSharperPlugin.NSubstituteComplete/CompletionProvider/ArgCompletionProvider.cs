@@ -137,8 +137,8 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
                         var argClass = TypeFactory.CreateTypeByCLRName("NSubstitute.Arg", information.Type.Module);
 
                         if (information.ArgSuffix == "Is")
-                            return factory.CreateArgument(ParameterKind.VALUE, factory.CreateExpression($"$0.{information.ArgSuffix}<$1>({information.TypeFirstLetter} => )", argClass, information.Type));
-                        return factory.CreateArgument(ParameterKind.VALUE, factory.CreateExpression($"$0.{information.ArgSuffix}<$1>()", argClass, information.Type));
+                            return factory.CreateExpression($"$0.{information.ArgSuffix}<$1>({information.TypeFirstLetter} => )", argClass, information.Type);
+                        return factory.CreateExpression($"$0.{information.ArgSuffix}<$1>()", argClass, information.Type);
                     }))
                 .WithMatcher(_ => (ILookupItemMatcher) new TextualMatcher<TextualInfo>(_.Info));
 

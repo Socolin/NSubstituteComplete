@@ -95,7 +95,7 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
                     (information, factory) =>
                     {
                         var substituteClass = TypeFactory.CreateTypeByCLRName("NSubstitute.Substitute", information.Type.Module);
-                        return factory.CreateArgument(ParameterKind.VALUE, factory.CreateExpression("$0.For<$1>()", substituteClass, information.Type));
+                        return factory.CreateExpression("$0.For<$1>()", substituteClass, information.Type);
                     }))
                 .WithMatcher(_ => (ILookupItemMatcher) new TextualMatcher<TextualInfo>(_.Info));
 
