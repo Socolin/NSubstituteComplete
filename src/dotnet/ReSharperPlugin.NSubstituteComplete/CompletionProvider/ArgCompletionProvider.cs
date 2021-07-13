@@ -87,7 +87,7 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
                 return;
             var typeName = expectedType.Type.GetPresentableName(context.Language);
             var text = context.IsQualified ? $"Any<{typeName}>()" : $"Arg.Any<{typeName}>()";
-            var lookupItem = CreateArgumentLookupItem(context, "Any", '\0', text, typeName, expectedType.DeclaredType);
+            var lookupItem = CreateArgumentLookupItem(context, "Any", '\0', text, typeName, expectedType.DeclaredType ?? expectedType.Type);
             if (lookupItem != null)
                 collector.Add(lookupItem);
         }
@@ -101,7 +101,7 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             var firstLetter = typeName.First().ToLowerFast();
             var text = context.IsQualified ? $"Is<{typeName}>({firstLetter} => )" : $"Arg.Is<{typeName}>({firstLetter} => )";
 
-            var lookupItem = CreateArgumentLookupItem(context, "Is", firstLetter, text, typeName, expectedType.DeclaredType);
+            var lookupItem = CreateArgumentLookupItem(context, "Is", firstLetter, text, typeName, expectedType.DeclaredType ?? expectedType.Type);
             lookupItem.SetInsertCaretOffset(-1);
             collector.Add(lookupItem);
         }
