@@ -66,6 +66,15 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider.Behaviors
                     assignmentExpression.SetSource(expression);
                 }
             }
+            else if (element is IExpressionInitializer expressionInitializer)
+            {
+                using (new PsiTransactionCookie(psiServices, DefaultAction.Commit, "Insert arguments"))
+                {
+                    var factory = CSharpElementFactory.GetInstance(expressionInitializer);
+                    var expression = _createExpressionFn(Info, factory);
+                    expressionInitializer.SetValue(expression);
+                }
+            }
             else
             {
                 throw new Exception("Scenario not supported, please report this on github: https://github.com/Socolin/NSubstituteComplete/issues");
@@ -82,6 +91,8 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider.Behaviors
                 if (element is IPropertyInitializer)
                     return element;
                 if (element is IAssignmentExpression)
+                    return element;
+                if (element is IExpressionInitializer)
                     return element;
                 element = element.Parent;
             }
