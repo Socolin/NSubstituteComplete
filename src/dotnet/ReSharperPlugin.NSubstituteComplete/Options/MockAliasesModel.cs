@@ -11,5 +11,7 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
             : base(lifetime, smartContext, smartContext.Schema.GetScalarEntry<NSubstituteCompleteSettings, string>(s => s.MockAliases))
         {
         }
+
+        public override Entry GetNewEntry() => new Entry(myLifetime, mySaveRequested.Incoming, string.Empty, string.Empty);
     }
 }
