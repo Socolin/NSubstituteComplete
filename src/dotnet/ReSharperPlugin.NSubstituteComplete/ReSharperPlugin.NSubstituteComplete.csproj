@@ -7,7 +7,7 @@
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <IsPackable>True</IsPackable>
     <DefineConstants>$(DefineConstants);RESHARPER</DefineConstants>
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -34,8 +34,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="PresentationCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\..\..\..\..\.nuget\packages\microsoft.netframework.referenceassemblies.net461\1.0.0-preview.2\build\.NETFramework\v4.6.1\PresentationCore.dll</HintPath>
+    <Reference Include="PresentationCore">
+      <HintPath>..\..\..\..\..\.nuget\packages\microsoft.netframework.referenceassemblies.net472\1.0.0\build\.NETFramework\v4.7.2\PresentationCore.dll</HintPath>
     </Reference>
   </ItemGroup>
 
