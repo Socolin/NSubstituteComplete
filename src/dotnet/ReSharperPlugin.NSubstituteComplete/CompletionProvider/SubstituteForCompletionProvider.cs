@@ -90,16 +90,16 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             };
 
             var lookupItem = LookupItemFactory.CreateLookupItem(info)
-                .WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<NSubstituteArgumentInformation>(_.Info, typename, true))
-                .WithBehavior(_ => (ILookupItemBehavior) new InsertNSubstituteArgumentBehavior(_.Info,
+                .WithPresentation(_ => new TextPresentation<NSubstituteArgumentInformation>(_.Info, typename, true))
+                .WithBehavior(_ => new InsertNSubstituteArgumentBehavior(_.Info,
                     (information, factory) =>
                     {
                         var substituteClass = TypeFactory.CreateTypeByCLRName("NSubstitute.Substitute", information.Type.Module);
                         return factory.CreateExpression("$0.For<$1>()", substituteClass, information.Type);
                     }))
-                .WithMatcher(_ => (ILookupItemMatcher) new TextualMatcher<TextualInfo>(_.Info));
+                .WithMatcher(_ => new TextualMatcher<TextualInfo>(_.Info));
 
-            lookupItem.WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<NSubstituteArgumentInformation>(_.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
+            lookupItem.WithPresentation(_ => new TextPresentation<NSubstituteArgumentInformation>(_.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
             lookupItem.WithHighSelectionPriority();
 
             return lookupItem;

@@ -130,8 +130,8 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             };
 
             var lookupItem = LookupItemFactory.CreateLookupItem(info)
-                .WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<NSubstituteArgumentInformation>(_.Info, typename, true))
-                .WithBehavior(_ => (ILookupItemBehavior) new InsertNSubstituteArgumentBehavior(_.Info,
+                .WithPresentation(_ => new TextPresentation<NSubstituteArgumentInformation>(_.Info, typename, true))
+                .WithBehavior(_ => new InsertNSubstituteArgumentBehavior(_.Info,
                     (information, factory) =>
                     {
                         var argClass = TypeFactory.CreateTypeByCLRName("NSubstitute.Arg", information.Type.Module);
@@ -140,9 +140,9 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
                             return factory.CreateExpression($"$0.{information.ArgSuffix}<$1>({information.TypeFirstLetter} => )", argClass, information.Type);
                         return factory.CreateExpression($"$0.{information.ArgSuffix}<$1>()", argClass, information.Type);
                     }))
-                .WithMatcher(_ => (ILookupItemMatcher) new TextualMatcher<TextualInfo>(_.Info));
+                .WithMatcher(_ => new TextualMatcher<TextualInfo>(_.Info));
 
-            lookupItem.WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<NSubstituteArgumentInformation>(_.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
+            lookupItem.WithPresentation(_ => new TextPresentation<NSubstituteArgumentInformation>(_.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
             lookupItem.WithHighSelectionPriority();
             if (argSuffix == "Is")
             {
@@ -162,11 +162,11 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             };
 
             var lookupItem = LookupItemFactory.CreateLookupItem(info)
-                .WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<NSubstituteArgumentsInformation>(_.Info, null, true))
-                .WithBehavior(_ => (ILookupItemBehavior) new InsertNSubstituteArgumentsBehavior(_.Info))
-                .WithMatcher(_ => (ILookupItemMatcher) new TextualMatcher<TextualInfo>(_.Info));
+                .WithPresentation(_ => new TextPresentation<NSubstituteArgumentsInformation>(_.Info, null, true))
+                .WithBehavior(_ => new InsertNSubstituteArgumentsBehavior(_.Info))
+                .WithMatcher(_ => new TextualMatcher<TextualInfo>(_.Info));
 
-            lookupItem.WithPresentation(_ => (ILookupItemPresentation) new TextPresentation<NSubstituteArgumentsInformation>(_.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
+            lookupItem.WithPresentation(_ => new TextPresentation<NSubstituteArgumentsInformation>(_.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
             lookupItem.WithHighSelectionPriority();
 
             return lookupItem;
