@@ -13,6 +13,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.UI.Automation;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.UnitTestFramework;
+using JetBrains.ReSharper.UnitTestFramework.UI.Options;
 using JetBrains.ReSharper.UnitTestFramework.UI.Options.ViewModel;
 using JetBrains.Rider.Model.UIAutomation;
 

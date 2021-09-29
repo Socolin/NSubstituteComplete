@@ -1,5 +1,5 @@
 using JetBrains.Application.Settings;
-using JetBrains.ReSharper.UnitTestFramework;
+using JetBrains.ReSharper.UnitTestFramework.Settings;
 
 namespace ReSharperPlugin.NSubstituteComplete.Options
 {
