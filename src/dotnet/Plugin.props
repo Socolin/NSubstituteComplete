@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <SdkVersion>2021.3.0-eap01</SdkVersion>
+    <SdkVersion>2022.1.0-eap06</SdkVersion>
 
     <Title>NSubstituteComplete</Title>
     <Description>Provide quick fixes and smart autocomplete when using NSubstitute</Description>
