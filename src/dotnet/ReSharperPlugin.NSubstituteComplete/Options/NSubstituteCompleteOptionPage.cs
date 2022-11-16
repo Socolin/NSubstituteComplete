@@ -59,7 +59,7 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
             var model = new MockAliasesModel(lifetime, smartContext);
             var beToolbar = model.SelectedEntry.GetBeSingleSelectionListWithToolbar(model.Entries,
                     lifetime,
-                    (entryLt, line, properties) => new List<BeControl>
+                    (entryLt, line, _) => new List<BeControl>
                     {
                         solution == null ? line.Name.GetBeTextBox(entryLt) : line.Name.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
                         solution == null ? line.Value.GetBeTextBox(entryLt) : line.Value.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance)
@@ -67,8 +67,8 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
                     iconHost,
                     new[] {"Type (interface),*", "Alias,*"},
                     dock: BeDock.RIGHT)
-                .AddButtonWithListAction(BeListAddAction.ADD, i => model.GetNewEntry(), customTooltip: "Add")
-                .AddButtonWithListAction<DictionaryModel<string, string>.Entry>(BeListAction.REMOVE, i => model.RemoveSelectedEntry(), customTooltip: "Remove");
+                .AddButtonWithListAction(BeListAddAction.ADD, _ => model.GetNewEntry(), customTooltip: "Add")
+                .AddButtonWithListAction<DictionaryModel<string, string>.Entry>(BeListAction.REMOVE, _ => model.RemoveSelectedEntry(), customTooltip: "Remove");
             if (!pageContext.IsRider)
                 beToolbar.BindToLocalProtocol(lifetime, locks);
 
