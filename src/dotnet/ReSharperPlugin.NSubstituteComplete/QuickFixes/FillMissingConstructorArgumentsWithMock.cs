@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Application.Progress;
+using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon.CSharp.Errors;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
@@ -121,10 +122,10 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
             for (var argumentIndex = 0; argumentIndex < targetConstructor.Parameters.Count; argumentIndex++)
             {
                 var parameter = targetConstructor.Parameters[argumentIndex];
-                if (!(parameter.Type is DeclaredTypeBase declaredTypeBase))
+                if (!(parameter.Type is IDeclaredType declaredType))
                     continue;
 
-                if (declaredTypeBase.GetClrName().FullName == "System.String")
+                if (declaredType.GetClrName().FullName == "System.String")
                 {
                     var argument = elementFactory.CreateArgument(ParameterKind.VALUE, elementFactory.CreateExpression("$0", $@"""some-{TextHelper.ToKebabCase(parameter.ShortName)}"""));
                     arguments.Add(argument);
@@ -132,11 +133,11 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
                 else
                 {
                     var expectedTypeConstraint = new CSharpImplicitlyConvertibleToConstraint(parameter.Type, cSharpTypeConversionRule, cSharpTypeConstraintsVerifier);
-                    var options = new SuggestionOptions(defaultName: declaredTypeBase.GetClrName().ShortName);
-                    var (mockedType, useNSubstituteMock) = GetMockedType(declaredTypeBase, mockAliases, expectedTypeConstraint);
-                    var fieldDeclaration = elementFactory.CreateTypeMemberDeclaration("private $0 $1;", mockedType, declaredTypeBase.GetClrName().ShortName);
+                    var options = new SuggestionOptions(defaultName: declaredType.GetClrName().ShortName);
+                    var (mockedType, useNSubstituteMock) = GetMockedType(declaredType, mockAliases, expectedTypeConstraint);
+                    var fieldDeclaration = elementFactory.CreateTypeMemberDeclaration("private $0 $1;", mockedType, declaredType.GetClrName().ShortName);
 
-                    var fieldName = psiServices.Naming.Suggestion.GetDerivedName(fieldDeclaration.DeclaredElement, NamedElementKinds.PrivateInstanceFields, ScopeKind.Common, _classDeclaration.Language, options, psiSourceFile);
+                    var fieldName = psiServices.Naming.Suggestion.GetDerivedName(fieldDeclaration.DeclaredElement.NotNull(), NamedElementKinds.PrivateInstanceFields, ScopeKind.Common, _classDeclaration.Language, options, psiSourceFile.NotNull());
 
                     var existingArgument = GetExistingArgument(expectedTypeConstraint, fieldName, _objectCreationExpression, argumentIndex);
                     if (existingArgument != null)
@@ -224,7 +225,7 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
         }
 
         private static (IType mockedType, bool useNSubstituteMock) GetMockedType(
-            DeclaredTypeBase parameterType,
+            IDeclaredType parameterType,
             Dictionary<string, List<(string TargetTypeExpression, string ClrMockedType)>> mockAliases,
             CSharpImplicitlyConvertibleToConstraint expectedType
         )
@@ -290,7 +291,7 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
             if (argumentIndex < objectCreationExpression.ArgumentList.Arguments.Count)
             {
                 var currentArgument = objectCreationExpression.ArgumentList.Arguments.Skip(argumentIndex).First();
-                if (expectedTypeConstraint.Accepts(currentArgument.Value.Type()))
+                if (expectedTypeConstraint.Accepts(currentArgument.Value.NotNull().Type()))
                 {
                     return currentArgument;
                 }
@@ -303,7 +304,7 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
 
             var matchingArguments = objectCreationExpression.ArgumentList.Arguments
                 .Select((arg, i) => (argument: arg, argumentIndex: i))
-                .Where(a => expectedTypeConstraint.Accepts(a.argument.Value.Type()))
+                .Where(a => expectedTypeConstraint.Accepts(a.argument.Value.NotNull().Type()))
                 .ToList();
             if (matchingArguments.Count == 0)
                 return null;
