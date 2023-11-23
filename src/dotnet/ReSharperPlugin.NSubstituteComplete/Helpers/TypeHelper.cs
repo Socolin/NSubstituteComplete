@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
@@ -22,7 +23,7 @@ namespace ReSharperPlugin.NSubstituteComplete.Helpers
             var type = TypeFactory.CreateTypeByCLRName(clrTypeName, module);
 
             var dictionary = new Dictionary<ITypeParameter, IType>();
-            var typeElement = type.GetTypeElement();
+            var typeElement = type.GetTypeElement().NotNull();
             var allTypeParameters = typeElement.GetAllTypeParameters();
             for (var index = 0; index < allTypeParameters.Count; index++)
             {

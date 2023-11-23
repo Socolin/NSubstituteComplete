@@ -46,7 +46,7 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             if (!(context.TerminatedContext.TreeNode?.GetContainingFile() is ICSharpFile cSharpFile))
                 return false;
 
-            if (!cSharpFile.Imports.Any(i => i.ImportedSymbolName.QualifiedName == "NSubstitute"))
+            if (!cSharpFile.Imports.Any(i => i is IUsingSymbolDirective usingSymbolDirective && usingSymbolDirective.ImportedSymbolName.QualifiedName == "NSubstitute"))
                 if (cSharpFile.GetProject()?.GetAllReferencedAssemblies().Any(x => x.Name == "NSubstitute") != true)
                     return false;
 
@@ -126,12 +126,13 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             var info = new NSubstituteArgumentInformation(text, text, type, argSuffix, typeFirstLetter)
             {
                 Ranges = context.CompletionRanges,
-                IsDynamic = false
+                IsDynamic = false,
+                TypeName = typename,
             };
 
             var lookupItem = LookupItemFactory.CreateLookupItem(info)
-                .WithPresentation(_ => new TextPresentation<NSubstituteArgumentInformation>(_.Info, typename, true))
-                .WithBehavior(_ => new InsertNSubstituteArgumentBehavior(_.Info,
+                .WithPresentation(static p => new TextPresentation<NSubstituteArgumentInformation>(p.Info, p.Info.TypeName, true))
+                .WithBehavior(static b => new InsertNSubstituteArgumentBehavior(b.Info,
                     (information, factory) =>
                     {
                         var argClass = TypeFactory.CreateTypeByCLRName("NSubstitute.Arg", information.Type.Module);
@@ -140,9 +141,9 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
                             return factory.CreateExpression($"$0.{information.ArgSuffix}<$1>({information.TypeFirstLetter} => )", argClass, information.Type);
                         return factory.CreateExpression($"$0.{information.ArgSuffix}<$1>()", argClass, information.Type);
                     }))
-                .WithMatcher(_ => new TextualMatcher<TextualInfo>(_.Info));
+                .WithMatcher(static m => new TextualMatcher<TextualInfo>(m.Info));
 
-            lookupItem.WithPresentation(_ => new TextPresentation<NSubstituteArgumentInformation>(_.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
+            lookupItem.WithPresentation(static p => new TextPresentation<NSubstituteArgumentInformation>(p.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
             lookupItem.WithHighSelectionPriority();
             if (argSuffix == "Is")
             {
@@ -158,15 +159,15 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             var info = new NSubstituteArgumentsInformation(text, text, types, "Any")
             {
                 Ranges = context.CompletionRanges,
-                IsDynamic = false
+                IsDynamic = false,
             };
 
             var lookupItem = LookupItemFactory.CreateLookupItem(info)
-                .WithPresentation(_ => new TextPresentation<NSubstituteArgumentsInformation>(_.Info, null, true))
-                .WithBehavior(_ => new InsertNSubstituteArgumentsBehavior(_.Info))
-                .WithMatcher(_ => new TextualMatcher<TextualInfo>(_.Info));
+                .WithPresentation(static p => new TextPresentation<NSubstituteArgumentsInformation>(p.Info, null, true))
+                .WithBehavior(static b => new InsertNSubstituteArgumentsBehavior(b.Info))
+                .WithMatcher(static m => new TextualMatcher<TextualInfo>(m.Info));
 
-            lookupItem.WithPresentation(_ => new TextPresentation<NSubstituteArgumentsInformation>(_.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
+            lookupItem.WithPresentation(static p => new TextPresentation<NSubstituteArgumentsInformation>(p.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
             lookupItem.WithHighSelectionPriority();
 
             return lookupItem;

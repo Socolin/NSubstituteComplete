@@ -13,7 +13,6 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.UI.Automation;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.UnitTestFramework.UI.Options;
-using JetBrains.ReSharper.UnitTestFramework.UI.Options.ViewModel;
 using JetBrains.Rider.Model.UIAutomation;
 
 namespace ReSharperPlugin.NSubstituteComplete.Options
@@ -32,6 +31,7 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
 
         public NSubstituteCompleteOptionPage(
             Lifetime lifetime,
+            [NotNull] IThreading threading,
             [NotNull] OptionsPageContext optionsPageContext,
             [NotNull] OptionsSettingsSmartContext optionsSettingsSmartContext,
             [NotNull] OptionsSettingsSmartContext smartContext,
@@ -44,11 +44,12 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
             : base(lifetime, optionsPageContext, optionsSettingsSmartContext, wrapInScrollablePanel)
         {
             AddHeader("NSubstituteComplete");
-            AddControl(MockAliases(lifetime, smartContext, pageContext, iconHost, locks, solution));
+            AddControl(MockAliases(lifetime, threading, smartContext, pageContext, iconHost, locks, solution));
         }
 
         private static BeControl MockAliases(
             Lifetime lifetime,
+            IThreading threading,
             OptionsSettingsSmartContext smartContext,
             OptionsPageContext pageContext,
             IconHostBase iconHost,
@@ -56,19 +57,19 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
             [CanBeNull] ISolution solution
         )
         {
-            var model = new MockAliasesModel(lifetime, smartContext);
+            var model = new MockAliasesModel(lifetime, threading.GroupingEvents, smartContext);
             var beToolbar = model.SelectedEntry.GetBeSingleSelectionListWithToolbar(model.Entries,
                     lifetime,
                     (entryLt, line, _) => new List<BeControl>
                     {
                         solution == null ? line.Name.GetBeTextBox(entryLt) : line.Name.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
-                        solution == null ? line.Value.GetBeTextBox(entryLt) : line.Value.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance)
+                        solution == null ? line.Value.GetBeTextBox(entryLt) : line.Value.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
                     },
                     iconHost,
                     new[] {"Type (interface),*", "Alias,*"},
                     dock: BeDock.RIGHT)
                 .AddButtonWithListAction(BeListAddAction.ADD, _ => model.GetNewEntry(), customTooltip: "Add")
-                .AddButtonWithListAction<DictionaryModel<string, string>.Entry>(BeListAction.REMOVE, _ => model.RemoveSelectedEntry(), customTooltip: "Remove");
+                .AddButtonWithListAction<BeTreeGridExtensions.DictionaryModel<string, string>.Entry>(BeListAction.REMOVE, _ => model.RemoveSelectedEntry(), customTooltip: "Remove");
             if (!pageContext.IsRider)
                 beToolbar.BindToLocalProtocol(lifetime, locks);
 

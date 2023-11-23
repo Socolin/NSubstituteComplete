@@ -37,7 +37,7 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             if (!(context.TerminatedContext.TreeNode?.GetContainingFile() is ICSharpFile cSharpFile))
                 return false;
 
-            if (!cSharpFile.Imports.Any(i => i.ImportedSymbolName.QualifiedName == "NSubstitute"))
+            if (!cSharpFile.Imports.Any(i => i is IUsingSymbolDirective usingSymbolDirective && usingSymbolDirective.ImportedSymbolName.QualifiedName == "NSubstitute"))
                 if (cSharpFile.GetProject()?.GetAllReferencedAssemblies().Any(x => x.Name == "NSubstitute") != true)
                     return false;
 
@@ -81,25 +81,33 @@ namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider
             return false;
         }
 
-        private static LookupItem<NSubstituteArgumentInformation> CreateArgumentLookupItem(CSharpCodeCompletionContext context, string argSuffix, char typeFirstLetter, string text, string typename, IType type)
+        private static LookupItem<NSubstituteArgumentInformation> CreateArgumentLookupItem(
+            CSharpCodeCompletionContext context,
+            string argSuffix,
+            char typeFirstLetter,
+            string text,
+            string typename,
+            IType type
+        )
         {
             var info = new NSubstituteArgumentInformation(text, text, type, argSuffix, typeFirstLetter)
             {
                 Ranges = context.CompletionRanges,
-                IsDynamic = false
+                IsDynamic = false,
+                TypeName = typename,
             };
 
             var lookupItem = LookupItemFactory.CreateLookupItem(info)
-                .WithPresentation(_ => new TextPresentation<NSubstituteArgumentInformation>(_.Info, typename, true))
-                .WithBehavior(_ => new InsertNSubstituteArgumentBehavior(_.Info,
+                .WithPresentation(static p => new TextPresentation<NSubstituteArgumentInformation>(p.Info, p.Info.TypeName, true))
+                .WithBehavior(static b => new InsertNSubstituteArgumentBehavior(b.Info,
                     (information, factory) =>
                     {
                         var substituteClass = TypeFactory.CreateTypeByCLRName("NSubstitute.Substitute", information.Type.Module);
                         return factory.CreateExpression("$0.For<$1>()", substituteClass, information.Type);
                     }))
-                .WithMatcher(_ => new TextualMatcher<TextualInfo>(_.Info));
+                .WithMatcher(static m => new TextualMatcher<TextualInfo>(m.Info));
 
-            lookupItem.WithPresentation(_ => new TextPresentation<NSubstituteArgumentInformation>(_.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
+            lookupItem.WithPresentation(p => new TextPresentation<NSubstituteArgumentInformation>(p.Info, null, true, PsiSymbolsThemedIcons.Method.Id));
             lookupItem.WithHighSelectionPriority();
 
             return lookupItem;

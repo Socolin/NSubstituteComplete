@@ -11,9 +11,7 @@ using NUnit.Framework;
 namespace ReSharperPlugin.NSubstituteComplete.Tests
 {
     [ZoneDefinition]
-    public interface INSubstituteCompleteTestZone : ITestsEnvZone, IRequire<PsiFeatureTestZone>
-    {
-    }
+    public interface INSubstituteCompleteTestZone : ITestsEnvZone, IRequire<PsiFeatureTestZone>;
 
     [ZoneActivator]
     public class PsiFeatureTestZoneActivator : IActivate<PsiFeatureTestZone>
@@ -22,7 +20,5 @@ namespace ReSharperPlugin.NSubstituteComplete.Tests
     }
 
     [SetUpFixture]
-    public class TestEnvironment : ExtensionTestEnvironmentAssembly<INSubstituteCompleteTestZone>
-    {
-    }
+    public class TestEnvironment : ExtensionTestEnvironmentAssembly<INSubstituteCompleteTestZone>;
 }
