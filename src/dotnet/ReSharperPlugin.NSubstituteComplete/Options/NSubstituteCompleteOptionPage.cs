@@ -60,11 +60,11 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
             var model = new MockAliasesModel(lifetime, threading.GroupingEvents, smartContext);
             var beToolbar = model.SelectedEntry.GetBeSingleSelectionListWithToolbar(model.Entries,
                     lifetime,
-                    (entryLt, line, _) => new List<BeControl>
-                    {
+                    (entryLt, line, _) =>
+                    [
                         solution == null ? line.Name.GetBeTextBox(entryLt) : line.Name.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
                         solution == null ? line.Value.GetBeTextBox(entryLt) : line.Value.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
-                    },
+                    ],
                     iconHost,
                     new[] {"Type (interface),*", "Alias,*"},
                     dock: BeDock.RIGHT)
