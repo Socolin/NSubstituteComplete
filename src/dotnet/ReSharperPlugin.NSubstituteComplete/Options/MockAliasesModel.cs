@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.Application.Settings;
 using JetBrains.Application.UI.Options;
 using JetBrains.IDE.UI.Extensions;
 using JetBrains.Lifetimes;
-using JetBrains.ReSharper.UnitTestFramework.Settings;
 using JetBrains.ReSharper.UnitTestFramework.UI.Options.ViewModel;
 using JetBrains.Threading;
-using JetBrains.Util.Media;
 
 namespace ReSharperPlugin.NSubstituteComplete.Options
 {

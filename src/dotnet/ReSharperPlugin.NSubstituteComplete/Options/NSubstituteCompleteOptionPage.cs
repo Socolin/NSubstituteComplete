@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
@@ -22,7 +21,6 @@ namespace ReSharperPlugin.NSubstituteComplete.Options
         null,
         ParentId = UnitTestingPages.General,
         NestingType = OptionPageNestingType.Inline,
-        IsAlignedWithParent = true,
         Sequence = 0.1d)]
     public class NSubstituteCompleteOptionPage : BeSimpleOptionsPage
     {
