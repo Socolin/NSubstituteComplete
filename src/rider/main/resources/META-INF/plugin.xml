@@ -12,5 +12,8 @@
 ]]>
   </description>
   <change-notes></change-notes>
+  <extensions>
+    <dependencySupport kind="dotnet" coordinate="NSubstitute" displayName="NSubstitute"/>
+  </extensions>
 
 </idea-plugin>
