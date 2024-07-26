@@ -8,7 +8,6 @@ using JetBrains.ReSharper.Daemon.CSharp.Errors;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
-using JetBrains.ReSharper.Psi.CSharp.Conversions;
 using JetBrains.ReSharper.Psi.CSharp.ExpectedTypes;
 using JetBrains.ReSharper.Psi.CSharp.Resolve;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
@@ -107,8 +106,7 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
             var elementFactory = CSharpElementFactory.GetInstance(treeNode);
             var psiServices = treeNode.GetPsiServices();
             var psiSourceFile = treeNode.GetSourceFile();
-            var cSharpTypeConversionRule = treeNode.GetTypeConversionRule();
-            var cSharpTypeConstraintsVerifier = new CSharpTypeConstraintsVerifier(treeNode.GetCSharpLanguageLevel(), cSharpTypeConversionRule);
+            var cSharpTypeConstraintsVerifier = new CSharpTypeConstraintsVerifier(treeNode.GetPsiModule());
             var mockAliases = NSubstituteCompleteSettingsHelper.GetSettings(solution)
                 .GetMockAliases();
 
@@ -132,7 +130,7 @@ namespace ReSharperPlugin.NSubstituteComplete.QuickFixes
                 }
                 else
                 {
-                    var expectedTypeConstraint = new CSharpImplicitlyConvertibleToConstraint(parameter.Type, cSharpTypeConversionRule, cSharpTypeConstraintsVerifier);
+                    var expectedTypeConstraint = new CSharpImplicitlyConvertibleToConstraint(parameter.Type, cSharpTypeConstraintsVerifier);
                     var options = new SuggestionOptions(defaultName: declaredType.GetClrName().ShortName);
                     var (mockedType, useNSubstituteMock) = GetMockedType(declaredType, mockAliases, expectedTypeConstraint);
                     var fieldDeclaration = elementFactory.CreateTypeMemberDeclaration("private $0 $1;", mockedType, declaredType.GetClrName().ShortName);
