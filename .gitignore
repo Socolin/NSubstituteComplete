@@ -1,25 +1,15 @@
-# Common IntelliJ Platform excludes
+/.idea/
+/.gradle/
+/.intellijPlatform/
 
-# User specific
-**/.idea/**/workspace.xml
-**/.idea/**/tasks.xml
-**/.idea/shelf/*
-**/.idea/dictionaries
-**/.idea/httpRequests/
+bin/
+obj/
+build/
 
-# Sensitive or high-churn files
-**/.idea/**/dataSources/
-**/.idea/**/dataSources.ids
-**/.idea/**/dataSources.xml
-**/.idea/**/dataSources.local.xml
-**/.idea/**/sqlDataSources.xml
-**/.idea/**/dynamic.xml
+/src/rider/generated/**/*.Generated.kt
+/src/dotnet/ReSharperPlugin.NSubstituteComplete/Model/**/*.Generated.cs
 
-# Rider
-# Rider auto-generates .iml files, and contentModel.xml
-**/.idea/**/*.iml
-**/.idea/**/contentModel.xml
-**/.idea/**/modules.xml
+/src/dotnet/nuget.config
 
 *.suo
 *.user
