@@ -28,4 +28,16 @@ jobs:
         set_check_status_from_test_outcome: true
         project_path: src/dotnet/ReSharperPlugin.NSubstituteComplete.Tests/ReSharperPlugin.NSubstituteComplete.Tests.csproj
         github_token: ${{ secrets.GITHUB_TOKEN }}
-
+    - name: Unpack Distribution
+      shell: pwsh
+      run: scripts/Unpack-Distribution.ps1
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+          name: NSubstituteCompleteRiderPlugin
+          path: build/distributions/unpacked
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+          name: NSubstituteCompleteReSharperPlugin
+          path: build/distributions/*.nupkg
