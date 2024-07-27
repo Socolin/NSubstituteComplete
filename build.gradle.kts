@@ -122,6 +122,30 @@ tasks {
 
     buildPlugin {
         dependsOn(compileDotNet)
+        doLast {
+            val dotnetSolution = File(dotNetSrcDir, "${dotNetPluginId}/${dotNetPluginId}.csproj").toString()
+            val outputPath = layout.buildDirectory.dir("distributions").get().toString()
+            val changelogText = file("${rootDir}/CHANGELOG.md").readText()
+            val changelogRegex = "(?s)(-.+?)(?=##|$)".toRegex()
+            val changeNotes = changelogRegex.findAll(changelogText)
+                .map { it.groupValues[1].replace("(?s)- ".toRegex(), "• ").replace("`", "").replace(",", "%2C") }
+                .take(1)
+                .joinToString("")
+
+            exec {
+                executable = "dotnet"
+                args = listOf(
+                    "msbuild",
+                    "/t:Pack",
+                    dotnetSolution,
+                    "/p:Configuration=$buildConfiguration",
+                    "/p:HostFullIdentifier=",
+                    "/p:PackageOutputPath=$outputPath",
+                    "/p:PackageReleaseNotes=$changeNotes",
+                    "/p:PackageVersion=$version"
+                )
+            }
+        }
     }
 
     patchPluginXml {
