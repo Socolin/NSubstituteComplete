@@ -32,12 +32,12 @@ jobs:
       shell: pwsh
       run: scripts/Unpack-Distribution.ps1
     - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
+      uses: actions/upload-artifact@v4.3.4
       with:
           name: NSubstituteCompleteRiderPlugin
           path: build/distributions/unpacked
     - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
+      uses: actions/upload-artifact@v4.3.4
       with:
           name: NSubstituteCompleteReSharperPlugin
           path: build/distributions/*.nupkg
