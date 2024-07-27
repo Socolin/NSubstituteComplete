@@ -14,6 +14,6 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$file = "$DistributionsLocation/ApplicationInsights-Debug-Log-Viewer-*.zip"
+$file = "$DistributionsLocation/*.zip"
 
 Expand-Archive -Path $file -DestinationPath $DistributionsLocation/unpacked
