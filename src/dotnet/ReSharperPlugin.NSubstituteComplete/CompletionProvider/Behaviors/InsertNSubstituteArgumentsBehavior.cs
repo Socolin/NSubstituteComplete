@@ -12,28 +12,27 @@ using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
-namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider.Behaviors
+namespace ReSharperPlugin.NSubstituteComplete.CompletionProvider.Behaviors;
+
+public class InsertNSubstituteArgumentsBehavior(NSubstituteArgumentsInformation info)
+    : TextualBehavior<NSubstituteArgumentsInformation>(info)
 {
-    public class InsertNSubstituteArgumentsBehavior(NSubstituteArgumentsInformation info)
-        : TextualBehavior<NSubstituteArgumentsInformation>(info)
+    public override void Accept(
+        ITextControl textControl,
+        DocumentRange nameRange,
+        LookupItemInsertType insertType,
+        Suffix suffix,
+        ISolution solution,
+        bool keepCaretStill
+    )
     {
-        public override void Accept(
-            ITextControl textControl,
-            DocumentRange nameRange,
-            LookupItemInsertType insertType,
-            Suffix suffix,
-            ISolution solution,
-            bool keepCaretStill
-        )
+        var psiServices = solution.GetPsiServices();
+        var invocationExpression = TextControlToPsi.GetElement<IInvocationExpression>(solution, textControl).NotNull();
+        using (new PsiTransactionCookie(psiServices, DefaultAction.Commit, "Insert arguments"))
         {
-            var psiServices = solution.GetPsiServices();
-            var invocationExpression = TextControlToPsi.GetElement<IInvocationExpression>(solution, textControl).NotNull();
-            using (new PsiTransactionCookie(psiServices, DefaultAction.Commit, "Insert arguments"))
-            {
-                var factory = CSharpElementFactory.GetInstance(invocationExpression);
-                var newInvocation = (IInvocationExpression)factory.CreateExpression("a(" + string.Join(", ", Info.Types.Select((_, i) => $"Arg.{Info.ArgSuffix}<${i}>()")) + ")", Info.Types.OfType<object>().ToArray());
-                invocationExpression.SetArgumentList(newInvocation.ArgumentList);
-            }
+            var factory = CSharpElementFactory.GetInstance(invocationExpression);
+            var newInvocation = (IInvocationExpression)factory.CreateExpression("a(" + string.Join(", ", Info.Types.Select((_, i) => $"Arg.{Info.ArgSuffix}<${i}>()")) + ")", Info.Types.OfType<object>().ToArray());
+            invocationExpression.SetArgumentList(newInvocation.ArgumentList);
         }
     }
 }

@@ -8,17 +8,16 @@ using NUnit.Framework;
 
 [assembly: Apartment(ApartmentState.STA)]
 
-namespace ReSharperPlugin.NSubstituteComplete.Tests
+namespace ReSharperPlugin.NSubstituteComplete.Tests;
+
+[ZoneDefinition]
+public interface INSubstituteCompleteTestZone : ITestsEnvZone, IRequire<PsiFeatureTestZone>;
+
+[ZoneActivator]
+public class PsiFeatureTestZoneActivator : IActivate<PsiFeatureTestZone>
 {
-    [ZoneDefinition]
-    public interface INSubstituteCompleteTestZone : ITestsEnvZone, IRequire<PsiFeatureTestZone>;
-
-    [ZoneActivator]
-    public class PsiFeatureTestZoneActivator : IActivate<PsiFeatureTestZone>
-    {
-        public bool ActivatorEnabled() => true;
-    }
-
-    [SetUpFixture]
-    public class TestEnvironment : ExtensionTestEnvironmentAssembly<INSubstituteCompleteTestZone>;
+    public bool ActivatorEnabled() => true;
 }
+
+[SetUpFixture]
+public class TestEnvironment : ExtensionTestEnvironmentAssembly<INSubstituteCompleteTestZone>;

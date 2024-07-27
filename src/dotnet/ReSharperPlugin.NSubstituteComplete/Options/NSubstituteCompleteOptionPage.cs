@@ -14,64 +14,65 @@ using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.UnitTestFramework.UI.Options;
 using JetBrains.Rider.Model.UIAutomation;
 
-namespace ReSharperPlugin.NSubstituteComplete.Options
+namespace ReSharperPlugin.NSubstituteComplete.Options;
+
+[OptionsPage(Id,
+    PageTitle,
+    null,
+    ParentId = UnitTestingPages.General,
+    NestingType = OptionPageNestingType.Inline,
+    Sequence = 0.1d
+)]
+public class NSubstituteCompleteOptionPage : BeSimpleOptionsPage
 {
-    [OptionsPage(Id,
-        PageTitle,
-        null,
-        ParentId = UnitTestingPages.General,
-        NestingType = OptionPageNestingType.Inline,
-        Sequence = 0.1d)]
-    public class NSubstituteCompleteOptionPage : BeSimpleOptionsPage
+    private new const string Id = nameof(NSubstituteCompleteOptionPage);
+    private const string PageTitle = "NSubstiteComplete";
+
+    public NSubstituteCompleteOptionPage(
+        Lifetime lifetime,
+        [NotNull] IThreading threading,
+        [NotNull] OptionsPageContext optionsPageContext,
+        [NotNull] OptionsSettingsSmartContext optionsSettingsSmartContext,
+        [NotNull] OptionsSettingsSmartContext smartContext,
+        [NotNull] OptionsPageContext pageContext,
+        [NotNull] IconHostBase iconHost,
+        [NotNull] IShellLocks locks,
+        [Optional] ISolution solution,
+        bool wrapInScrollablePanel = false
+    )
+        : base(lifetime, optionsPageContext, optionsSettingsSmartContext, wrapInScrollablePanel)
     {
-        private new const string Id = nameof(NSubstituteCompleteOptionPage);
-        private const string PageTitle = "NSubstiteComplete";
+        AddHeader("NSubstituteComplete");
+        AddControl(MockAliases(lifetime, threading, smartContext, pageContext, iconHost, locks, solution));
+    }
 
-        public NSubstituteCompleteOptionPage(
-            Lifetime lifetime,
-            [NotNull] IThreading threading,
-            [NotNull] OptionsPageContext optionsPageContext,
-            [NotNull] OptionsSettingsSmartContext optionsSettingsSmartContext,
-            [NotNull] OptionsSettingsSmartContext smartContext,
-            [NotNull] OptionsPageContext pageContext,
-            [NotNull] IconHostBase iconHost,
-            [NotNull] IShellLocks locks,
-            [Optional] ISolution solution,
-            bool wrapInScrollablePanel = false
-        )
-            : base(lifetime, optionsPageContext, optionsSettingsSmartContext, wrapInScrollablePanel)
-        {
-            AddHeader("NSubstituteComplete");
-            AddControl(MockAliases(lifetime, threading, smartContext, pageContext, iconHost, locks, solution));
-        }
+    private static BeControl MockAliases(
+        Lifetime lifetime,
+        IThreading threading,
+        OptionsSettingsSmartContext smartContext,
+        OptionsPageContext pageContext,
+        IconHostBase iconHost,
+        IShellLocks locks,
+        [CanBeNull] ISolution solution
+    )
+    {
+        var model = new MockAliasesModel(lifetime, threading.GroupingEvents, smartContext);
+        var beToolbar = model.SelectedEntry.GetBeSingleSelectionListWithToolbar(model.Entries,
+                lifetime,
+                (entryLt, line, _) =>
+                [
+                    solution == null ? line.Name.GetBeTextBox(entryLt) : line.Name.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
+                    solution == null ? line.Value.GetBeTextBox(entryLt) : line.Value.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
+                ],
+                iconHost,
+                new[] {"Type (interface),*", "Alias,*"},
+                dock: BeDock.RIGHT
+            )
+            .AddButtonWithListAction(BeListAddAction.ADD, _ => model.GetNewEntry(), customTooltip: "Add")
+            .AddButtonWithListAction<BeTreeGridExtensions.DictionaryModel<string, string>.Entry>(BeListAction.REMOVE, _ => model.RemoveSelectedEntry(), customTooltip: "Remove");
+        if (!pageContext.IsRider)
+            beToolbar.BindToLocalProtocol(lifetime, locks);
 
-        private static BeControl MockAliases(
-            Lifetime lifetime,
-            IThreading threading,
-            OptionsSettingsSmartContext smartContext,
-            OptionsPageContext pageContext,
-            IconHostBase iconHost,
-            IShellLocks locks,
-            [CanBeNull] ISolution solution
-        )
-        {
-            var model = new MockAliasesModel(lifetime, threading.GroupingEvents, smartContext);
-            var beToolbar = model.SelectedEntry.GetBeSingleSelectionListWithToolbar(model.Entries,
-                    lifetime,
-                    (entryLt, line, _) =>
-                    [
-                        solution == null ? line.Name.GetBeTextBox(entryLt) : line.Name.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
-                        solution == null ? line.Value.GetBeTextBox(entryLt) : line.Value.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
-                    ],
-                    iconHost,
-                    new[] {"Type (interface),*", "Alias,*"},
-                    dock: BeDock.RIGHT)
-                .AddButtonWithListAction(BeListAddAction.ADD, _ => model.GetNewEntry(), customTooltip: "Add")
-                .AddButtonWithListAction<BeTreeGridExtensions.DictionaryModel<string, string>.Entry>(BeListAction.REMOVE, _ => model.RemoveSelectedEntry(), customTooltip: "Remove");
-            if (!pageContext.IsRider)
-                beToolbar.BindToLocalProtocol(lifetime, locks);
-
-            return beToolbar.WithMinSize(BeControlSizes.GetSize(height: BeControlSizeType.SMALL), lifetime);
-        }
+        return beToolbar.WithMinSize(BeControlSizes.GetSize(height: BeControlSizeType.SMALL), lifetime);
     }
 }
