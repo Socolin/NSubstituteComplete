@@ -57,6 +57,10 @@ dependencies {
     testImplementation(libs.openTest4J)
 }
 
+intellijPlatform {
+    buildSearchableOptions = false
+}
+
 kotlin {
     jvmToolchain {
         languageVersion = JavaLanguageVersion.of(17)
