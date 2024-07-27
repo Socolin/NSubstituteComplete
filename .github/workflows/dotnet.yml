@@ -19,7 +19,7 @@ jobs:
     - name: Build plugin
       uses: eskatos/gradle-command-action@v1.4.0
       with:
-        arguments: buildPlugin --stacktrace -PintellijPublishToken=none
+        arguments: buildPlugin --stacktrace
     - name: dotnet-tests-report
       uses: zyborg/dotnet-tests-report@v1.4.4
       with:
