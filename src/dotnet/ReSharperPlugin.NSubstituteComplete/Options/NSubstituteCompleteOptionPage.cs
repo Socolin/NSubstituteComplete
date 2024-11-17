@@ -8,6 +8,7 @@ using JetBrains.IDE.UI.Extensions;
 using JetBrains.IDE.UI.Extensions.Properties;
 using JetBrains.IDE.UI.Options;
 using JetBrains.Lifetimes;
+using JetBrains.Platform.RdFramework.RdVerification;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.UI.Automation;
 using JetBrains.ReSharper.Psi.CSharp;

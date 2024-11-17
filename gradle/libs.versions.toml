@@ -1,7 +1,7 @@
 [versions]
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-kotlin = "1.9.24"
-rdGen = "2024.1.1"
+kotlin = "2.0.21"
+rdGen = "2024.3.1"
 
 [libraries]
 kotlinStdLib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
