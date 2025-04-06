@@ -2,7 +2,9 @@
 <project version="4">
   <component name="UserContentModel">
     <attachedFolders />
-    <explicitIncludes />
+    <explicitIncludes>
+      <Path>.github/workflows/dotnet.yml</Path>
+    </explicitIncludes>
     <explicitExcludes />
   </component>
 </project>
