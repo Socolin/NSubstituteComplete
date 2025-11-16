@@ -21,8 +21,8 @@ public static class NSubstituteCompleteSettingsHelper
     public static Dictionary<string, List<(string TargetTypeExpression, string ClrMockedType)>> GetMockAliases(this NSubstituteCompleteSettings settings)
     {
         var rawAliases = settings.MockAliases
-            .Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => x.Split(new[] {'='}, 2))
+            .Split([';'], StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => x.Split(['='], 2))
             .Where(x => x.Length == 2);
 
         var aliases = new Dictionary<string, List<(string TargetTypeExpression, string ClrMockedType)>>();

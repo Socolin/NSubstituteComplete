@@ -60,13 +60,13 @@ public class NSubstituteCompleteOptionPage : BeSimpleOptionsPage
         var model = new MockAliasesModel(lifetime, threading.GroupingEvents, smartContext);
         var beToolbar = model.SelectedEntry.GetBeSingleSelectionListWithToolbar(model.Entries,
                 lifetime,
-                (entryLt, line, _) =>
+                (lt, line, _) =>
                 [
-                    solution == null ? line.Name.GetBeTextBox(entryLt) : line.Name.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
-                    solution == null ? line.Value.GetBeTextBox(entryLt) : line.Value.GetBeTextBox(entryLt).WithTypeCompletion(solution, lifetime, CSharpLanguage.Instance),
+                    solution == null ? line.Name.GetBeTextBox(lt) : line.Name.GetBeTextBox(lt).WithTypeCompletion(solution, lt, CSharpLanguage.Instance),
+                    solution == null ? line.Value.GetBeTextBox(lt) : line.Value.GetBeTextBox(lt).WithTypeCompletion(solution, lt, CSharpLanguage.Instance),
                 ],
                 iconHost,
-                new[] {"Type (interface),*", "Alias,*"},
+                ["Type (interface),*", "Alias,*"],
                 dock: BeDock.RIGHT
             )
             .AddButtonWithListAction(BeListAddAction.ADD, _ => model.GetNewEntry(), customTooltip: "Add")
